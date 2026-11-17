@@ -64,6 +64,8 @@ Decisions only you can make. Each has a recommended answer that the plan current
 
 ➡️ Yes to both: private GitHub repo, agents commit on feature branches.
 
+**Status 2026-11-17:** private repo `martinmoll/EnergyTrading` created (D-025). Agent commit policy still open.
+
 ---
 
 ❓ **Q11 — Stack sign-off.** Python 3.12 + uv + Polars + DuckDB/Parquet + LightGBM/PyTorch + Streamlit, no orchestrator or MLflow initially. (D-010 – D-012)

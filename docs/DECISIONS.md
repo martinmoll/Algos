@@ -172,7 +172,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-022 — Specs live in `docs/specs/` until an issue tracker exists
 
-2026-11-17 · provisional · agent
+2026-11-17 · superseded by D-025 · agent
 
 **Context.** `/to-spec` publishes to an issue tracker; none is configured and there is no git remote (Q10).
 **Decision.** Specs are Markdown files `docs/specs/NNNN-slug.md` with a `labels` front-matter field (`ready-for-agent`). Move them to the tracker when one exists.
@@ -190,3 +190,10 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 **Decision.** Assumed knowledge time for backfilled day-ahead prices = 13:00 Europe/Oslo on D-1 (results ≈12:45, plus 15 min safety lag).
 **Revisit** after live snapshots record actual publication times.
+
+## D-025 — GitHub Issues on a private repo is the tracker; specs and tickets live there
+
+2026-11-17 · accepted · user
+
+**Context.** `/setup-matt-pocock-skills`: the user chose a new private GitHub repo and the default triage labels. This also answers Q10 (remote: yes).
+**Decision.** Repo `martinmoll/EnergyTrading` (private). Specs and tickets are GitHub issues; the Phase 0 spec moved from `docs/specs/` to issue #1. Config in `docs/agents/`.
