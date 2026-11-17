@@ -2,7 +2,26 @@
 
 Algorithmic and machine-learning trading research for the Nordic power markets — Norway, Sweden, Denmark and Finland (12 bidding zones) — built around one rule: **no look-ahead, ever**.
 
-Status: plan v1 (2026-11-16). No application code yet.
+Status: Phase 0 in progress — walking skeleton (naive DK1/DK2 day-ahead backtest) works end to end.
+
+## Setup
+
+Needs [uv](https://docs.astral.sh/uv/). On a clean machine:
+
+```sh
+uv sync                      # installs Python 3.12 and all dependencies into .venv
+uv run python check.py       # lint, format check, type check, tests
+```
+
+## Run
+
+```sh
+uv run nordpower ingest elspotprices --start 2025-09-01 --end 2025-09-21   # raw snapshot
+uv run nordpower curate                                                    # -> as-of store
+uv run nordpower backtest --start 2025-09-08 --end 2025-09-21              # run record in data/runs/
+```
+
+Dates are delivery days. Data lives in `data/` (git-ignored). Energi Data Service rate-limits `Elspotprices` to about one request per 5 minutes; ingest waits automatically.
 
 ## Read in this order
 

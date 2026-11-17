@@ -197,3 +197,19 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 **Context.** `/setup-matt-pocock-skills`: the user chose a new private GitHub repo and the default triage labels. This also answers Q10 (remote: yes).
 **Decision.** Repo `martinmoll/EnergyTrading` (private). Specs and tickets are GitHub issues; the Phase 0 spec moved from `docs/specs/` to issue #1. Config in `docs/agents/`.
+
+## D-026 — No system price in Phase 0; free SYS source is an open research item
+
+2026-11-17 · provisional · agent
+
+**Context.** Plan and spec assumed Energi Data Service `Elspotprices` carried the Nordic system price until 2025-09. A live query shows its `SYS` series ends 2010-12-31.
+**Decision.** Phase 0 runs on DK1 and DK2 only. The SYS pseudo-zone stays in the zones config. Finding a source for the system price (needed for futures/EPAD work, S4) is added to the research backlog; Nord Pool's paid data is the known fallback (Q4).
+**Also found.** `Elspotprices` rate-limits to about one request per 5 minutes (it is a discontinued dataset). Ingest waits out HTTP 429; the backfill in #10 should use few, large requests.
+
+## D-027 — Phase 0 stack is trimmed to what the code uses
+
+2026-11-17 · provisional · agent
+
+**Context.** Spec #1 listed DuckDB, httpx, pydantic, hypothesis and import-linter (D-010, D-011). The walking skeleton (#2) needs none of them yet.
+**Decision.** Phase 0 uses Polars (Parquet scans for the store), stdlib `urllib` for HTTP, stdlib `tomllib` with TOML configs instead of pydantic + YAML, and `tzdata` (Windows has no system time-zone database). hypothesis arrives with #3 and import-linter with #6. DuckDB comes back when a query needs SQL or Polars scans get slow.
+**Also.** The curated column is `knowledge_time_grade`, matching the glossary; plan docs 03 and 06 were updated from `knowledge_time_source`. The zones config has no per-zone time zone because every Nordic zone uses the single market time zone in the time module.

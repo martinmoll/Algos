@@ -1,0 +1,35 @@
+[project]
+name = "nordpower"
+version = "0.1.0"
+description = "Nordic power trading research with strict no-look-ahead discipline"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "polars>=1.20",
+    "tzdata>=2026.6",
+]
+
+[project.scripts]
+nordpower = "nordpower.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.8", "pyright>=1.1.390"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "DTZ"]
+
+[tool.pyright]
+include = ["src", "tests"]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

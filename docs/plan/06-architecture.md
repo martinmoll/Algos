@@ -82,7 +82,7 @@ features ─▶ models ─▶ strategies ─▶ backtest/live engine ─▶ exec
 
 ```python
 view = store.as_of(t)                  # raises inside the vault without a token
-df = view.read("load_forecast", zones=[...], event_start=..., event_end=...)
+df = view.read("da_price", zones=[...], event_start=..., event_end=...)
 #   → latest version per (key, event_time) with knowledge_time <= t
 view.now                               # == t; features use it for lags
 ```
@@ -91,7 +91,7 @@ Design intent: a deep module. Small interface, all the bitemporal complexity (ve
 
 ## 5. Store schema (curated tables)
 
-Common columns: `zone` (or other key), `event_time` (UTC), `resolution` (`PT15M|PT60M|P1D|P1W`), `value` columns, `knowledge_time` (UTC), `knowledge_time_source`, `source`, `ingested_at`, `raw_ref` (pointer to the raw snapshot row for audit).
+Common columns: `zone` (or other key), `event_time` (UTC), `resolution` (`PT15M|PT60M|P1D|P1W`), `value` columns, `knowledge_time` (UTC), `knowledge_time_grade`, `source`, `ingested_at`, `raw_ref` (pointer to the raw snapshot row for audit).
 
 Native resolution is stored as published; resampling (e.g. 15-min → hourly mean) happens in features with explicit rules, never in storage.
 

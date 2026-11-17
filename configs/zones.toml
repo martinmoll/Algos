@@ -1,0 +1,45 @@
+# Canonical zone identifiers. EIC codes from memory (2026-11-17) ⚠️ — verify when ENTSO-E ingest lands.
+# All Nordic zones trade on Nordic local time (Europe/Oslo == CET/CEST).
+
+[NO1]
+eic = "10YNO-1--------2"
+country = "NO"
+[NO2]
+eic = "10YNO-2--------T"
+country = "NO"
+[NO3]
+eic = "10YNO-3--------J"
+country = "NO"
+[NO4]
+eic = "10YNO-4--------9"
+country = "NO"
+[NO5]
+eic = "10Y1001A1001A48H"
+country = "NO"
+[SE1]
+eic = "10Y1001A1001A44P"
+country = "SE"
+[SE2]
+eic = "10Y1001A1001A45N"
+country = "SE"
+[SE3]
+eic = "10Y1001A1001A46L"
+country = "SE"
+[SE4]
+eic = "10Y1001A1001A47J"
+country = "SE"
+[DK1]
+eic = "10YDK-1--------W"
+country = "DK"
+[DK2]
+eic = "10YDK-2--------M"
+country = "DK"
+[FI]
+eic = "10YFI-1--------U"
+country = "FI"
+
+# Nordic system price: a reference price, not a bidding zone.
+[SYS]
+eic = ""
+country = ""
+pseudo = true

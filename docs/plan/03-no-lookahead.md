@@ -14,7 +14,7 @@ Look-ahead is prevented **by construction** (the architecture makes leaking hard
 | `knowledge_time` | Earliest instant the value was knowable to a market participant. UTC. |
 | `ingested_at` | When *we* stored it. UTC. Never used for modelling; used for audit. |
 
-Plus `knowledge_time_source ∈ {observed, published, assumed}`:
+Plus `knowledge_time_grade ∈ {observed, published, assumed}`:
 
 - **observed** — we snapshotted it live; `knowledge_time = ingested_at` (conservative: we cannot have known it earlier than we saw it).
 - **published** — the source supplies a trustworthy publication timestamp (UMM messages, Energinet `Forecasts_Hour.TimestampUTC`, NVE publication dates, weather model run time + documented dissemination delay).
