@@ -213,3 +213,11 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 **Context.** Spec #1 listed DuckDB, httpx, pydantic, hypothesis and import-linter (D-010, D-011). The walking skeleton (#2) needs none of them yet.
 **Decision.** Phase 0 uses Polars (Parquet scans for the store), stdlib `urllib` for HTTP, stdlib `tomllib` with TOML configs instead of pydantic + YAML, and `tzdata` (Windows has no system time-zone database). hypothesis arrives with #3 and import-linter with #6. DuckDB comes back when a query needs SQL or Polars scans get slow.
 **Also.** The curated column is `knowledge_time_grade`, matching the glossary; plan docs 03 and 06 were updated from `knowledge_time_source`. The zones config has no per-zone time zone because every Nordic zone uses the single market time zone in the time module.
+
+## D-028 — Naive forecasts on DST days match by local clock hour; data gaps stay missing
+
+2026-11-17 · provisional · agent
+
+**Decision.** The naive model maps the reference day to the delivery day by local clock hour. When the reference day is the spring DST day (no 02:00), 02:00 is filled from 01:00. When it is the autumn DST day, its two 02:00 prices are averaged. On an autumn DST delivery day both 02:00 hours get the same forecast. An hour missing from an ordinary reference day is **not** filled: that hour gets no forecast and the run's `n` drops below `n_expected`.
+**Why.** Clock-hour matching is the standard EPF convention and keeps daily load shapes aligned. Filling ordinary gaps would hide data problems; quality checks (#8) should surface them instead.
+**Also.** The decision cutoff is now derived as gate closure (12:00 local D-1) minus a 30-minute margin, so the two cannot drift apart.

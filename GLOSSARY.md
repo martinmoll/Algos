@@ -51,6 +51,14 @@ _Avoid_: Capacities, NTC (the earlier, different method)
 **Urgent market message (UMM)**:
 A REMIT disclosure of an outage or other inside information, with a publication time and versions.
 
+**Clock hour**:
+The hour shown on the local wall clock (00–23); the repeated autumn hour has the same clock hour twice and the spring DST day has no 02.
+_Avoid_: Local hour, hour number, hour index
+
+**Reference day**:
+The past delivery day whose prices the naive forecast repeats: the same weekday a week earlier for Monday, Saturday and Sunday, the day before otherwise.
+_Avoid_: Lag day, source day
+
 **Residual load**:
 Demand minus wind, solar and other must-run generation; what dispatchable plants must cover.
 _Avoid_: Net load, net demand

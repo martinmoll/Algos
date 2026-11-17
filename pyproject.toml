@@ -12,7 +12,12 @@ dependencies = [
 nordpower = "nordpower.cli:main"
 
 [dependency-groups]
-dev = ["pytest>=8", "ruff>=0.8", "pyright>=1.1.390"]
+dev = [
+    "pytest>=8",
+    "ruff>=0.8",
+    "pyright>=1.1.390",
+    "hypothesis>=6.170.15",
+]
 
 [build-system]
 requires = ["hatchling"]
