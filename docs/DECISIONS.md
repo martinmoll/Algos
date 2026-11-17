@@ -221,3 +221,16 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 **Decision.** The naive model maps the reference day to the delivery day by local clock hour. When the reference day is the spring DST day (no 02:00), 02:00 is filled from 01:00. When it is the autumn DST day, its two 02:00 prices are averaged. On an autumn DST delivery day both 02:00 hours get the same forecast. An hour missing from an ordinary reference day is **not** filled: that hour gets no forecast and the run's `n` drops below `n_expected`.
 **Why.** Clock-hour matching is the standard EPF convention and keeps daily load shapes aligned. Filling ordinary gaps would hide data problems; quality checks (#8) should surface them instead.
 **Also.** The decision cutoff is now derived as gate closure (12:00 local D-1) minus a 30-minute margin, so the two cannot drift apart.
+
+## D-029 — Vintage rules: compare with what we held at ingestion; a changed value is known from when we ingested it
+
+2026-11-17 · provisional · agent
+
+**Decision.**
+- `Store.append` compares each row with the vintage held for its key as of the row's own `ingested_at` (an as-of join). Identical values are dropped, so re-curating any old snapshot stores nothing.
+- A row that changes a held value gets knowledge time max(publication-rule time, ingested_at), graded `observed` when that moves it later. Without this, a corrected price would appear in views from before we downloaded it: look-ahead.
+- A row with no earlier vintage keeps the knowledge time the curator gave it (for backfill: the publication rule, graded `assumed`).
+- Raw snapshots are named `<timestamp>_<content hash>`. A download identical to the latest snapshot of the same request writes nothing; any other content, including a revert to an older value, is a new snapshot. Files are opened with mode `x` and never overwritten, renamed or deleted.
+- The D-024 day-ahead rule (13:00 local on D-1) now lives only in `configs/publication_rules.toml`; every rule carries a `reviewed` note.
+
+**Known limits.** A changed value ingested *before* its rule time keeps the rule time, so it ties with its predecessor and wins on ingestion order; that is correct, since it really was the latest value by then. If raw snapshots were curated out of ingestion order, an earlier-ingested change could not move a later vintage's stored knowledge time (rows are immutable); curate processes snapshots in timestamp order, so this does not arise today. The store does not check that `assumed` knowledge times came from the rules; only curate assigns them. Prices published as null are skipped, so a withdrawn value never becomes a vintage.

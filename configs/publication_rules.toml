@@ -1,0 +1,10 @@
+# Assumed knowledge times for backfilled data (docs/plan/03-no-lookahead.md §1).
+# Rules must err LATE, never early. Every change needs a review note and a decision-log entry.
+#
+# rule = "local_time_on_day_before_delivery": knowable at `local_time` (Europe/Oslo)
+#        on the day before the value's delivery day.
+
+[da_price]
+rule = "local_time_on_day_before_delivery"
+local_time = "13:00"  # results publish ~12:45; 15 min safety lag
+reviewed = "2026-11-17, D-024"

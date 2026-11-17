@@ -7,7 +7,6 @@ MARKET_TZ = ZoneInfo("Europe/Oslo")  # shared by every Nordic bidding zone (CET/
 HOUR = timedelta(hours=1)
 DA_GATE_CLOSURE = time(12, 0)  # local, on D-1
 DA_DECISION_MARGIN = timedelta(minutes=30)  # D-008: decide 30 min before gate closure
-DA_ASSUMED_KNOWN_AT = time(13, 0)  # D-024: results ~12:45 + 15 min safety lag
 
 
 def local_instant(d: date, t: time) -> datetime:
@@ -26,9 +25,9 @@ def decision_cutoff(delivery_day: date) -> datetime:
     return da_gate_closure(delivery_day) - DA_DECISION_MARGIN
 
 
-def da_assumed_knowledge_time(event_time: datetime) -> datetime:
-    """Assumed knowledge time of a backfilled day-ahead price: 13:00 local on D-1."""
-    return local_instant(delivery_day_of(event_time) - timedelta(days=1), DA_ASSUMED_KNOWN_AT)
+def local_time_on_day_before_delivery(event_time: datetime, at: time) -> datetime:
+    """UTC instant of local time `at` on the day before `event_time`'s delivery day."""
+    return local_instant(delivery_day_of(event_time) - timedelta(days=1), at)
 
 
 def delivery_span(first: date, last: date) -> tuple[datetime, datetime]:

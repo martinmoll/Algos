@@ -12,10 +12,10 @@ import pytest
 
 from nordpower.backtest import run_backtest
 from nordpower.models.naive import Naive
+from nordpower.publication import assumed_knowledge_time
 from nordpower.store import Store
 from nordpower.timeutil import (
     MARKET_TZ,
-    da_assumed_knowledge_time,
     delivery_span,
     hours_of,
 )
@@ -40,7 +40,7 @@ def synthetic_prices(first: date, last: date) -> pl.DataFrame:
                 "event_time": t,
                 "resolution": "PT60M",
                 "price_eur_mwh": float(price),
-                "knowledge_time": da_assumed_knowledge_time(t),
+                "knowledge_time": assumed_knowledge_time("da_price", t),
                 "knowledge_time_grade": "assumed",
                 "source": "synthetic",
                 "ingested_at": start,

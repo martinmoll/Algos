@@ -1,5 +1,6 @@
 """Energi Data Service (Energinet) ingest. No API key. Writes raw snapshots only."""
 
+import hashlib
 import json
 import re
 import time
@@ -8,7 +9,6 @@ import urllib.request
 from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlencode
-from uuid import uuid4
 
 BASE = "https://api.energidataservice.dk/dataset/"
 SOURCE = "energidataservice"
@@ -44,11 +44,24 @@ def fetch_elspotprices(raw_root: Path, start: datetime, end: datetime, zones: li
     )
     url = f"{BASE}Elspotprices?{query}"
     # ponytail: one request per call; paging/resume for multi-year backfills is ticket #10
-    payload = http_get(url)
-    ingested_at = datetime.now(UTC)
-    d = raw_root / SOURCE / "Elspotprices"
+    return _write_snapshot(raw_root / SOURCE / "Elspotprices", url, http_get(url)["records"])
+
+
+def _write_snapshot(d: Path, url: str, records: list[dict]) -> Path:
+    """Append-only raw snapshot, named <timestamp>_<content hash>. A download identical to the
+    latest snapshot of the same request writes nothing; any other content (including a revert
+    to an older value) is a new snapshot."""
+    digest = hashlib.sha256(json.dumps(records, sort_keys=True).encode()).hexdigest()[:16]
     d.mkdir(parents=True, exist_ok=True)
-    path = d / f"{ingested_at:%Y%m%dT%H%M%S}_{uuid4().hex[:8]}.json"
-    snapshot = {"ingested_at": ingested_at.isoformat(), "url": url, "records": payload["records"]}
-    path.write_text(json.dumps(snapshot), encoding="utf-8")
+    # ponytail: reads snapshots newest-first until the same URL; index by URL if this gets slow
+    for p in sorted(d.glob("*.json"), reverse=True):
+        if json.loads(p.read_text(encoding="utf-8"))["url"] == url:
+            if p.stem.endswith(digest):
+                return p
+            break
+    ingested_at = datetime.now(UTC)
+    path = d / f"{ingested_at:%Y%m%dT%H%M%S%f}_{digest}.json"
+    snapshot = {"ingested_at": ingested_at.isoformat(), "url": url, "records": records}
+    with open(path, "x", encoding="utf-8") as f:  # "x": never overwrite a snapshot
+        json.dump(snapshot, f)
     return path

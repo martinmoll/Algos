@@ -18,7 +18,7 @@ def price_row(value: float, knowledge_time: datetime) -> dict:
         "knowledge_time": knowledge_time,
         "knowledge_time_grade": "assumed",
         "source": "test",
-        "ingested_at": utc(2026, 11, 17),
+        "ingested_at": knowledge_time,  # observed live: seen the moment it was knowable
         "raw_ref": "test#0",
     }
 
