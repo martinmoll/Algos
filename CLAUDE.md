@@ -11,7 +11,7 @@ The full contract is [docs/plan/03-no-lookahead.md](docs/plan/03-no-lookahead.md
 - Realised weather (or any realised value) for the delivery period is never a model input.
 - Fit every transform (scaler, imputer, selector) inside the model's `fit` on the knowledge view it is given.
 - Time-series evaluation is walk-forward only. No random splits.
-- Never weaken, skip or delete a leakage test to get a build green. A failing leakage test means the pipeline is wrong until proven otherwise.
+- Never weaken, skip or delete a leakage test to get a build green. A failing leakage test means the pipeline is wrong until proven otherwise. The suite is `tests/leakage/` plus the import contract in `pyproject.toml` (`[tool.importlinter]`); `check.py` runs both as their own gates. When you add a package that consumes data (features, strategies), add it to the import contract and to `GUARDED` in `tests/leakage/test_boundaries.py`.
 - The vault period is sealed. Do not read it, plot it or compute statistics on it without an explicit decision-log entry.
 - Every backtest is a recorded run; quote results only with their run id. Do not delete run records.
 - A result that looks too good is a bug report, not a finding.

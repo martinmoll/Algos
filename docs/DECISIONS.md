@@ -234,3 +234,16 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 - The D-024 day-ahead rule (13:00 local on D-1) now lives only in `configs/publication_rules.toml`; every rule carries a `reviewed` note.
 
 **Known limits.** A changed value ingested *before* its rule time keeps the rule time, so it ties with its predecessor and wins on ingestion order; that is correct, since it really was the latest value by then. If raw snapshots were curated out of ingestion order, an earlier-ingested change could not move a later vintage's stored knowledge time (rows are immutable); curate processes snapshots in timestamp order, so this does not arise today. The store does not check that `assumed` knowledge times came from the rules; only curate assigns them. Prices published as null are skipped, so a withdrawn value never becomes a vintage.
+
+## D-030 — How the look-ahead suite enforces the contract, and what it does not cover yet
+
+2026-11-17 · provisional · agent
+
+**Decision.**
+- Tests live in `tests/leakage/` and run as their own gate in `check.py`, with config `addopts` and `PYTEST_ADDOPTS` cleared. Under that gate a skipped, xfailed or deselected test fails the run.
+- Time-travel compares each view with an independent plain-Python statement of the as-of rule and with a physically truncated store. Future poison runs multi-day backtests so an engine that reuses later views is caught. The canary goes down to microsecond offsets and covers a future vintage on a key that already has a known one. The shuffled-target null and future poison run over `MODELS`, and every new model must be added there.
+- The import boundary is an import-linter **forbidden** contract: models may not import ingest, curate, the engine or the CLI. A line-regex scan forbids direct data access (file readers, `Path`, `Store`, dynamic imports). This is not an allow-list of "KnowledgeView only" as in plan 06 §3. A forbid-list is what import-linter expresses cleanly, and the regex covers the rest. Its ceiling (aliased or multi-line calls) is marked `ponytail:`.
+- The canary asserts the view returns nothing before the knowledge time. That is how "the store refuses" (plan 03 §5.4) shows up through this interface.
+- Every check was mutation-tested: six injected leaks and two attempts to filter the gate all failed the check command.
+
+**Not covered yet.** The too-good alarm (plan 03 §5.5) belongs to the run status in #9. The causal-imputation lint (§5.6) waits until code that imputes exists. Features and strategies packages must be added to the import contract when created (CLAUDE.md says so).

@@ -17,6 +17,7 @@ dev = [
     "ruff>=0.8",
     "pyright>=1.1.390",
     "hypothesis>=6.170.15",
+    "import-linter>=2.16",
 ]
 
 [build-system]
@@ -38,3 +39,14 @@ typeCheckingMode = "standard"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+# Look-ahead boundary (docs/plan/06-architecture.md §3). Add nordpower.features and
+# nordpower.strategies to source_modules when those packages exist.
+[tool.importlinter]
+root_package = "nordpower"
+
+[[tool.importlinter.contracts]]
+name = "Models see data only through a KnowledgeView"
+type = "forbidden"
+source_modules = ["nordpower.models"]
+forbidden_modules = ["nordpower.ingest", "nordpower.curate", "nordpower.backtest", "nordpower.cli"]
