@@ -250,7 +250,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-031 — Vault guard: what is sealed, how it is opened, how research runs are scored
 
-2026-11-18 · provisional · agent
+2026-11-18 · accepted (user confirmed 2026-11-18: forward period stays sealed until Phase 3) · agent
 
 **Context.** Ticket #5 seals the vault (D-014) in code. Plan 03 §6 says an opening is logged, counted and backed by a decision-log entry naming the single configuration being evaluated.
 
@@ -282,7 +282,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-032 — 15-minute day-ahead prices: native storage, hourly means in the naive model, scoring per MTU
 
-2026-11-18 · provisional · agent
+2026-11-18 · accepted (user confirmed 2026-11-18: naive stays hourly-flat within each hour) · agent
 
 **Context.** Ticket #7. The day-ahead MTU became 15 minutes from delivery day 2025-10-01. Energi Data Service publishes the two eras as separate datasets.
 
