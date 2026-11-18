@@ -68,7 +68,7 @@ EnergyTrading/
 ## 3. Dependency rule (enforced by import-linter)
 
 ```
-ingest ─▶ store ◀─ curate
+ingest ─▶ store ◀─ curate   (curate also reads ingest's source definitions, never the reverse)
               ▲
               │ KnowledgeView only
 features ─▶ models ─▶ strategies ─▶ backtest/live engine ─▶ execution, evaluation

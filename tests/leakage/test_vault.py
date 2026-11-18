@@ -9,7 +9,7 @@ import pytest
 from nordpower.backtest import run_backtest
 from nordpower.models.naive import Naive
 from nordpower.store import REPO, Store, VaultSealed, VaultToken, load_vault_start
-from nordpower.timeutil import delivery_span, local_instant
+from nordpower.timeutil import da_mtus, local_instant
 
 from .conftest import price_rows
 
@@ -89,11 +89,12 @@ def test_a_view_before_the_boundary_never_shows_events_inside_the_vault(tmp_path
 
 
 def store_around_boundary(root) -> Store:
-    """Hourly DK1 prices for delivery 2025-11-01..2025-11-20, assumed knowledge times."""
-    start, end = delivery_span(date(2025, 11, 1), date(2025, 11, 20))
-    hours = [start + timedelta(hours=i) for i in range((end - start) // timedelta(hours=1))]
+    """15-minute DK1 prices for delivery 2025-11-01..2025-11-20, assumed knowledge times."""
+    days = [date(2025, 11, 1) + timedelta(days=i) for i in range(20)]
+    mtus = [t for d in days for t in da_mtus(d)]
+    prices = {("DK1", t): float(i) for i, t in enumerate(mtus)}
     store = Store(root)
-    store.append("da_price", price_rows({("DK1", h): float(i) for i, h in enumerate(hours)}, end))
+    store.append("da_price", price_rows(prices, BOUNDARY + timedelta(days=5), resolution="PT15M"))
     return store
 
 
@@ -113,7 +114,7 @@ def test_a_research_run_scores_with_what_was_known_before_the_boundary(tmp_path)
     config = json.loads((run / "config.json").read_text(encoding="utf-8"))
     assert datetime.fromisoformat(config["scored_as_of"]) == JUST_BEFORE
     metrics = json.loads((run / "metrics.json").read_text(encoding="utf-8"))
-    assert metrics["DK1"]["n"] == metrics["DK1"]["n_expected"] == 6 * 24
+    assert metrics["DK1"]["n"] == metrics["DK1"]["n_expected"] == 6 * 96
 
 
 def test_a_vault_run_is_exactly_one_logged_opening(tmp_path):
@@ -133,7 +134,7 @@ def test_a_vault_run_is_exactly_one_logged_opening(tmp_path):
     config = json.loads((run / "config.json").read_text(encoding="utf-8"))
     assert config["vault_opening"] == entry
     metrics = json.loads((run / "metrics.json").read_text(encoding="utf-8"))
-    assert metrics["DK1"]["n"] == 5 * 24
+    assert metrics["DK1"]["n"] == 5 * 96
 
 
 def test_the_boundary_is_one_config_value(tmp_path):

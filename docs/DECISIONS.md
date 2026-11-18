@@ -279,3 +279,32 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 **Revisit if:**
 - Phase 3 needs forward data. It then needs a read path for t after the vault that still hides vault-era events.
 - The user resizes the vault (Q7).
+
+## D-032 — 15-minute day-ahead prices: native storage, hourly means in the naive model, scoring per MTU
+
+2026-11-18 · provisional · agent
+
+**Context.** Ticket #7. The day-ahead MTU became 15 minutes from delivery day 2025-10-01. Energi Data Service publishes the two eras as separate datasets.
+
+**Dataset status, checked against the live API on 2026-11-18 ✅.**
+- `Elspotprices` is unchanged (fields `HourUTC`, `SpotPriceEUR`). Its last row is delivery day 2025-09-30, 23:00 local (HourUTC 2025-09-30T21:00).
+- `DayAheadPrices` (fields `TimeUTC`, `DayAheadPriceEUR`) starts at 2025-10-01 00:00 local, every 15 minutes, with no hourly rows before.
+- Neither record carries a resolution field. Nothing changed from what D-026 and plan 02 assumed.
+
+**Decision.**
+- **Storage.** `da_price` stores both datasets at native resolution, with no resampling. The `resolution` code comes from the delivery day, using one market-design date in the time module (`da_resolution`: PT60M before 2025-10-01, PT15M from it). Curation stops with an error on any row whose dataset does not match its day's era, so the two sources cannot overlap silently. It checks the era only, not row spacing: an hourly-spaced row in the 15-minute era becomes an incomplete hour in the naive model, and data-shape checks are ticket #8.
+- **Naive model.** Reference-day prices are averaged to hourly means, and only complete hours count (MTU durations adding up to 60 minutes; the `PT…` code → duration map lives in the time module). The existing clock-hour rules (D-028) then apply. Each MTU of the delivery day, hourly or 15-minute, gets its clock hour's forecast. The rule is part of `model_rule` in the run config.
+- **Scoring.** Scoring is per MTU of the delivery day, so `n_expected` is 96 for an ordinary 15-minute day. Metrics per zone carry `eras` keyed by the delivery day's MTU (`PT60M`, `PT15M`), alongside the totals. Every zone and every era in the run is reported, with `n` 0 when nothing was scored.
+
+**Why.**
+- A 15-minute product settles per quarter-hour, so scoring hourly means would hide the intra-hour error that the 15-minute market is about.
+- Using only complete hours follows D-028: a gap stays visible instead of being half-filled.
+
+**Alternatives rejected.**
+- Resampling to hourly in storage: the ticket forbids it, and it loses the native data.
+- Scoring against hourly mean actuals: that measures a product nobody trades.
+- Averaging whatever quarter-hours are present: a missing quarter would shift the mean unnoticed.
+
+**Revisit if:**
+- The intra-hour shape model (D-015) lands: the naive benchmark then stays hourly-flat by design.
+- A source publishes mixed resolutions within a day.

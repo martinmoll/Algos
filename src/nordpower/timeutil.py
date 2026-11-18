@@ -3,10 +3,15 @@
 from datetime import UTC, date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
+import polars as pl
+
 MARKET_TZ = ZoneInfo("Europe/Oslo")  # shared by every Nordic bidding zone (CET/CEST)
 HOUR = timedelta(hours=1)
 DA_GATE_CLOSURE = time(12, 0)  # local, on D-1
 DA_DECISION_MARGIN = timedelta(minutes=30)  # D-008: decide 30 min before gate closure
+# Day-ahead market time unit by delivery day (D-032): 15 minutes from 2025-10-01.
+DA_15MIN_FROM = date(2025, 10, 1)
+RESOLUTION = {"PT60M": HOUR, "PT15M": timedelta(minutes=15)}
 
 
 def local_instant(d: date, t: time) -> datetime:
@@ -41,9 +46,25 @@ def mtus_of(delivery_day: date, resolution: timedelta) -> list[datetime]:
     return [start + i * resolution for i in range((end - start) // resolution)]
 
 
+def da_resolution(delivery_day: date) -> str:
+    """Day-ahead MTU of the delivery day, as an ISO 8601 duration code."""
+    return "PT15M" if delivery_day >= DA_15MIN_FROM else "PT60M"
+
+
+def da_mtus(delivery_day: date) -> list[datetime]:
+    """UTC start of each day-ahead MTU of the delivery day."""
+    return mtus_of(delivery_day, RESOLUTION[da_resolution(delivery_day)])
+
+
 def hours_of(delivery_day: date) -> list[datetime]:
     """UTC start of each hour of the delivery day (23/24/25 hours)."""
     return mtus_of(delivery_day, HOUR)
+
+
+def hour_start(instants: pl.Expr) -> pl.Expr:
+    """Start of the hour containing each UTC instant. Truncating in UTC gives the local hour
+    too, because Europe/Oslo offsets from UTC are whole hours."""
+    return instants.dt.truncate("1h")
 
 
 def local_clock_hour(instant: datetime) -> int:

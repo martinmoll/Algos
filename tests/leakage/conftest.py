@@ -26,13 +26,15 @@ CHANGES_AT = [datetime(2024, 3, d, 18, tzinfo=UTC) for d in (25, 29)] + [
 ]
 
 
-def price_rows(prices: dict[tuple[str, datetime], float], ingested_at: datetime) -> pl.DataFrame:
+def price_rows(
+    prices: dict[tuple[str, datetime], float], ingested_at: datetime, resolution: str = "PT60M"
+) -> pl.DataFrame:
     return pl.DataFrame(
         [
             {
                 "zone": zone,
                 "event_time": t,
-                "resolution": "PT60M",
+                "resolution": resolution,
                 "price_eur_mwh": p,
                 "knowledge_time": assumed_knowledge_time("da_price", t),
                 "knowledge_time_grade": ASSUMED,

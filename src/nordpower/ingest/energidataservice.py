@@ -29,8 +29,19 @@ def http_get(url: str) -> dict:
     raise RuntimeError(f"still rate-limited after {MAX_RETRIES} attempts: {url}")
 
 
-def fetch_elspotprices(raw_root: Path, start: datetime, end: datetime, zones: list[str]) -> Path:
-    """Fetch hourly day-ahead prices for start <= HourUTC < end and store one raw snapshot."""
+# dataset -> (UTC time field, EUR price field, the one MTU it publishes) (✅ live API,
+# 2026-11-18): Elspotprices ends with delivery day 2025-09-30, DayAheadPrices starts 2025-10-01.
+PRICE_DATASETS = {
+    "Elspotprices": ("HourUTC", "SpotPriceEUR", "PT60M"),
+    "DayAheadPrices": ("TimeUTC", "DayAheadPriceEUR", "PT15M"),
+}
+
+
+def fetch_prices(
+    dataset: str, raw_root: Path, start: datetime, end: datetime, zones: list[str]
+) -> Path:
+    """Fetch day-ahead prices for start <= time < end and store one raw snapshot."""
+    time_field, _, _ = PRICE_DATASETS[dataset]
     fmt = "%Y-%m-%dT%H:%M"
     query = urlencode(
         {
@@ -38,13 +49,13 @@ def fetch_elspotprices(raw_root: Path, start: datetime, end: datetime, zones: li
             "end": end.astimezone(UTC).strftime(fmt),
             "timezone": "UTC",
             "filter": json.dumps({"PriceArea": zones}),
-            "sort": "HourUTC asc",
+            "sort": f"{time_field} asc",
             "limit": 0,
         }
     )
-    url = f"{BASE}Elspotprices?{query}"
+    url = f"{BASE}{dataset}?{query}"
     # ponytail: one request per call; paging/resume for multi-year backfills is ticket #10
-    return _write_snapshot(raw_root / SOURCE / "Elspotprices", url, http_get(url)["records"])
+    return _write_snapshot(raw_root / SOURCE / dataset, url, http_get(url)["records"])
 
 
 def _write_snapshot(d: Path, url: str, records: list[dict]) -> Path:

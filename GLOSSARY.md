@@ -14,6 +14,10 @@ _Avoid_: Price area, region, market area
 The period a market price applies to; 15 minutes in day-ahead since delivery day 2025-10-01, 60 minutes before.
 _Avoid_: Interval, slot, period, hour (unless it really is an hour)
 
+**Era**:
+The span of delivery days sharing one day-ahead MTU: the hourly era (to 2025-09-30) and the 15-minute era (from 2025-10-01). Backtest metrics are reported per era.
+_Avoid_: Regime (the regime calendar lists every market-design change; an era is defined by the MTU alone)
+
 **Delivery day**:
 The 24-hour local-time (CET/CEST) day in which electricity is delivered; has 23 or 25 hours on DST changes.
 _Avoid_: Trading day (that is the day the auction runs), date

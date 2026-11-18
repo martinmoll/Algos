@@ -12,7 +12,7 @@ import polars as pl
 
 from nordpower.models.naive import Naive
 from nordpower.store import KnowledgeView, Store, VaultSealed, VaultToken
-from nordpower.timeutil import decision_cutoff, delivery_span, hours_of
+from nordpower.timeutil import da_mtus, da_resolution, decision_cutoff, delivery_span
 
 
 class Model(Protocol):
@@ -61,24 +61,34 @@ def _score(
             err=pl.col("forecast") - pl.col("actual"), bench_err=pl.col("bench") - pl.col("actual")
         )
     )
-    per_zone = joined.group_by("zone").agg(
-        n=pl.len(),
-        mae=pl.col("err").abs().mean(),
-        rmse=(pl.col("err") ** 2).mean().sqrt(),
-        bench_mae=pl.col("bench_err").abs().mean(),
-    )
-    expected = sum(len(hours_of(d)) for d in days)
-    # ponytail: hours missing a forecast or an actual are only counted, not flagged; ticket #8
-    return {
-        r["zone"]: {
-            "n": r["n"],
-            "n_expected": expected,
-            "mae": r["mae"],
-            "rmse": r["rmse"],
-            "rmae": r["mae"] / r["bench_mae"] if r["bench_mae"] else None,
-        }
-        for r in per_zone.sort("zone").iter_rows(named=True)
+    # Era = the delivery day's MTU: the hourly and 15-minute eras are scored apart (D-032).
+    # Every zone and every era in the run is reported, with n = 0 when nothing was scored.
+    era_of = {d: da_resolution(d) for d in days}
+    joined = joined.with_columns(era=pl.col("delivery_day").replace_strict(era_of))
+    expected = {
+        e: sum(len(da_mtus(d)) for d in days if era_of[d] == e) for e in set(era_of.values())
     }
+
+    def summary(scored: pl.DataFrame, n_expected: int) -> dict:
+        mae, bench_mae = scored["err"].abs().mean(), scored["bench_err"].abs().mean()
+        return {
+            "n": len(scored),
+            "n_expected": n_expected,
+            "mae": mae,
+            "rmse": (scored["err"] ** 2).mean() ** 0.5 if len(scored) else None,  # type: ignore[operator]
+            "rmae": mae / bench_mae if mae is not None and bench_mae else None,  # type: ignore[operator]
+        }
+
+    # ponytail: MTUs missing a forecast or an actual are only counted, not flagged; ticket #8
+    out = {}
+    for zone in zones:
+        z = joined.filter(pl.col("zone") == zone)
+        out[zone] = summary(z, sum(expected.values())) | {
+            "eras": {
+                e: summary(z.filter(pl.col("era") == e), expected[e]) for e in sorted(expected)
+            }
+        }
+    return out
 
 
 def _git_sha() -> str:

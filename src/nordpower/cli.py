@@ -6,8 +6,8 @@ from datetime import date
 from pathlib import Path
 
 from nordpower.backtest import run_backtest
-from nordpower.curate import curate_elspotprices
-from nordpower.ingest.energidataservice import fetch_elspotprices
+from nordpower.curate import curate_prices
+from nordpower.ingest.energidataservice import PRICE_DATASETS, fetch_prices
 from nordpower.models.naive import Naive
 from nordpower.store import Store
 from nordpower.timeutil import delivery_span
@@ -28,7 +28,7 @@ def main(argv: list[str] | None = None) -> None:
     sub = p.add_subparsers(dest="cmd", required=True)
 
     ing = sub.add_parser("ingest", help="download raw snapshots")
-    ing.add_argument("dataset", choices=["elspotprices"])
+    ing.add_argument("dataset", choices=[d.lower() for d in PRICE_DATASETS])
     ing.add_argument("--start", type=date.fromisoformat, required=True, help="first delivery day")
     ing.add_argument("--end", type=date.fromisoformat, required=True, help="last delivery day")
     ing.add_argument("--zones", type=_zones, default=["DK1", "DK2"])
@@ -46,9 +46,10 @@ def main(argv: list[str] | None = None) -> None:
     store = Store(a.data_dir)
 
     if a.cmd == "ingest":
-        print(fetch_elspotprices(raw, *delivery_span(a.start, a.end), a.zones))
+        dataset = next(d for d in PRICE_DATASETS if d.lower() == a.dataset)
+        print(fetch_prices(dataset, raw, *delivery_span(a.start, a.end), a.zones))
     elif a.cmd == "curate":
-        print(f"curated {curate_elspotprices(raw, store)} da_price rows")
+        print(f"curated {curate_prices(raw, store)} da_price rows")
     elif a.cmd == "backtest":
         run_dir = run_backtest(store, Naive(a.zones), a.zones, a.start, a.end, a.data_dir / "runs")
         print(run_dir)
