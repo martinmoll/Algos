@@ -113,6 +113,10 @@ A run counted toward multiple-testing statistics for its strategy family; every 
 The sealed period of recent history that research code cannot read, reserved for single final evaluations.
 _Avoid_: Holdout, test set (ambiguous with walk-forward test blocks)
 
+**Vault opening**:
+One deliberate, logged decision to read the vault, citing the decision-log entry that pre-registers the configuration being evaluated. Openings are counted; one opening may cover a whole evaluation.
+_Avoid_: Vault access, peek
+
 **Walk-forward**:
 Evaluation in which a model is repeatedly fit on data known up to a decision time and scored on the periods that follow.
 _Avoid_: Cross-validation, backtest (the broader activity)

@@ -149,7 +149,9 @@ def test_shuffled_target_shows_no_skill(history_store, tmp_path, model):
     """On prices shuffled across time, the pipeline must do no better than a constant.
 
     A pipeline that leaked the realised price would score MAE near zero here."""
-    latest = view_rows(history_store, datetime(2030, 1, 1, tzinfo=UTC))
+    latest_known = datetime(2025, 1, 1, tzinfo=UTC)  # after all history, before the vault
+    assert all_rows(history_store)["knowledge_time"].max() < latest_known  # type: ignore[operator]
+    latest = view_rows(history_store, latest_known)
     shuffled_prices = latest["price_eur_mwh"].sample(fraction=1.0, shuffle=True, seed=42)
     keys = zip(latest["zone"], latest["event_time"], strict=True)
     # one vintage per hour, knowable at its publication-rule time, so every hour is forecastable

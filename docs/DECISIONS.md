@@ -247,3 +247,35 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 - Every check was mutation-tested: six injected leaks and two attempts to filter the gate all failed the check command.
 
 **Not covered yet.** The too-good alarm (plan 03 §5.5) belongs to the run status in #9. The causal-imputation lint (§5.6) waits until code that imputes exists. Features and strategies packages must be added to the import contract when created (CLAUDE.md says so).
+
+## D-031 — Vault guard: what is sealed, how it is opened, how research runs are scored
+
+2026-11-18 · provisional · agent
+
+**Context.** Ticket #5 seals the vault (D-014) in code. Plan 03 §6 says an opening is logged, counted and backed by a decision-log entry naming the single configuration being evaluated.
+
+**Decision.**
+- The boundary is one config value: `start` in `configs/vault.toml`, read as 00:00 Europe/Oslo on that day (2025-11-16, D-014). Nothing in `src` repeats it.
+- `as_of(t)` raises `VaultSealed` for any t at or after the boundary, the forward period after 2026-11-16 included, since a view there would also see vault data.
+- Without a token, a view before the boundary hides every event at or after the boundary. Prices for delivery on 2025-11-16 publish at 13:00 on the 15th, before the boundary, but they are vault data.
+- `store.open_vault(purpose)` is the only way in. The purpose must cite a decision-log entry (D-nnn) that exists in this file. Each opening appends one line (time, purpose, caller file:line) to `vault_log.jsonl` in the store root and returns a token. `as_of` accepts only tokens that store issued.
+- `run_backtest` refuses every delivery day inside the vault, not only decision cutoffs there: the 2025-11-16 delivery day has its cutoff on the 15th but is still vault data. A vault run takes `vault_purpose` and opens the vault itself, so one run is exactly one logged opening and a token can never be reused for a second configuration. Its run config copies the log entry.
+- Research runs score against actuals as known just before the boundary. Vault runs score with current knowledge, as a final evaluation should.
+- Model code may not build a `KnowledgeView` or mention the vault (the boundary scan in `tests/leakage/test_boundaries.py`).
+
+**Why.** Counting per opening, not per `as_of` call, keeps the count meaningful: a one-year vault run makes 365 views but is one look. Opening inside `run_backtest` closes the gap where one token could evaluate several configurations.
+
+**Alternatives rejected.**
+- Logging every `as_of` call with a token: it inflates the count by hundreds per run.
+- A caller-held token for `run_backtest`: it can be reused across runs.
+- Letting views before the boundary see vault events: that leaks one delivery day.
+
+**Cost.**
+- A price corrected after the boundary has the ingestion time as its knowledge time, so research scoring uses the earlier vintage.
+- The vault log sits with the data, which git ignores. The decision-log entry each opening cites is what stays in git.
+- **This changes plan 05:** forward data is unreadable for now. The plan's intra-hour models "on the pre-vault slice plus forward data" wait for a forward read path.
+- Tests that read today's downloads open the vault, citing this entry.
+
+**Revisit if:**
+- Phase 3 needs forward data. It then needs a read path for t after the vault that still hides vault-era events.
+- The user resizes the vault (Q7).

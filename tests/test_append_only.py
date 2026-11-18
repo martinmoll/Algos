@@ -11,6 +11,8 @@ FORBIDDEN = re.compile(
     r"\.unlink\(|\brmtree\b|os\.remove|os\.replace|\.rename\((?!\{)|write_text\(|write_bytes\("
     r"|open\([^)]*[\"'][wa]b?\+?[\"']|write_parquet\(\s*[^f)]"
 )
+# The one file that is meant to grow: the vault log gains a line per opening (D-031).
+VAULT_LOG_APPEND = re.compile(r"open\(self\.root / \"vault_log\.jsonl\", \"a\"")
 
 
 def test_raw_and_curated_writers_never_overwrite_or_delete():
@@ -18,7 +20,7 @@ def test_raw_and_curated_writers_never_overwrite_or_delete():
         f"{p.name}:{i}: {line.strip()}"
         for p in WRITERS
         for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)
-        if FORBIDDEN.search(line)
+        if FORBIDDEN.search(line) and not VAULT_LOG_APPEND.search(line)
     ]
     assert offences == []
 
@@ -32,3 +34,5 @@ def test_the_check_catches_an_overwrite():
     assert not FORBIDDEN.search("datetime.fromisoformat(s).replace(tzinfo=UTC)")
     assert not FORBIDDEN.search('df.rename({"a": "b"})')
     assert FORBIDDEN.search("path.rename(target)")
+    assert FORBIDDEN.search('open(d / "part.parquet", "a")')
+    assert not VAULT_LOG_APPEND.search('open(d / "part.parquet", "a")')

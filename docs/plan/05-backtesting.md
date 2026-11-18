@@ -13,7 +13,7 @@ How we measure, so that a number on the dashboard means something. Builds on [03
 - **Vault**: the 12 months before project start (2025-11-16 → 2026-11-16). Conveniently it is almost exactly the 15-minute day-ahead era so far. Unreadable by research code (the store refuses `as_of` times inside it unless a vault token is supplied). Each opening is logged and counted; the expectation is single digits per year.
 - **Forward**: everything after go-live of the paper-trading loop; hash-chained. Grows forever and gradually becomes the main evidence.
 
-Because the vault covers nearly all 15-minute DA data, intra-hour shape models are developed on the short pre-vault slice (2025-10-01 → 2025-11-15) plus *forward* data, and are labelled low-confidence until a year of forward data exists. This trade-off is recorded in the decision log (D-014).
+Because the vault covers nearly all 15-minute DA data, intra-hour shape models are developed on the short pre-vault slice (2025-10-01 → 2025-11-15) plus *forward* data, and are labelled low-confidence until a year of forward data exists. This trade-off is recorded in the decision log (D-014). Until a forward read path exists, forward data is sealed along with the vault (D-031).
 
 ## 2. Walk-forward engine
 

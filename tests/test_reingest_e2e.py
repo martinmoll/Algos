@@ -34,10 +34,11 @@ def pipeline(tmp_path, monkeypatch):
 
 def dk1_price(root: Path, t: datetime) -> float:
     hour = datetime.fromisoformat(REVISED_HOUR).replace(tzinfo=UTC)
-    df = (
-        Store(root)
-        .as_of(t)
-        .read("da_price", zones=["DK1"], event_start=hour, event_end=hour.replace(hour=12))
+    store = Store(root)
+    # downloads happen now, after the vault boundary, so reading them opens the vault
+    vault = store.open_vault("D-031 test: downloads made today are after the vault boundary")
+    df = store.as_of(t, vault=vault).read(
+        "da_price", zones=["DK1"], event_start=hour, event_end=hour.replace(hour=12)
     )
     return df["price_eur_mwh"].item()
 

@@ -11,7 +11,7 @@ from uuid import uuid4
 import polars as pl
 
 from nordpower.models.naive import Naive
-from nordpower.store import KnowledgeView, Store
+from nordpower.store import KnowledgeView, Store, VaultSealed, VaultToken
 from nordpower.timeutil import decision_cutoff, delivery_span, hours_of
 
 
@@ -27,10 +27,10 @@ def _days(first: date, last: date) -> list[date]:
     return [first + timedelta(days=i) for i in range((last - first).days + 1)]
 
 
-def _decide(store: Store, model: Model, days: list[date]) -> pl.DataFrame:
+def _decide(store: Store, model: Model, days: list[date], vault: VaultToken | None) -> pl.DataFrame:
     out = []
     for day in days:
-        view = store.as_of(decision_cutoff(day))
+        view = store.as_of(decision_cutoff(day), vault=vault)
         model.fit(view)
         forecast = model.predict(view, day)
         out.append(forecast.with_columns(delivery_day=pl.lit(day), decision_time=pl.lit(view.now)))
@@ -44,9 +44,12 @@ def _score(
     bench: pl.DataFrame,
     zones: list[str],
     days: list[date],
+    vault: VaultToken | None,
 ) -> dict:
     start, end = delivery_span(days[0], days[-1])
-    actual = store.as_of(scored_at).read("da_price", zones=zones, event_start=start, event_end=end)
+    actual = store.as_of(scored_at, vault=vault).read(
+        "da_price", zones=zones, event_start=start, event_end=end
+    )
     joined = (
         forecasts.join(
             bench.select("zone", "event_time", bench="forecast"), on=["zone", "event_time"]
@@ -88,14 +91,32 @@ def _git_sha() -> str:
 
 
 def run_backtest(
-    store: Store, model: Model, zones: list[str], first: date, last: date, runs_root: Path
+    store: Store,
+    model: Model,
+    zones: list[str],
+    first: date,
+    last: date,
+    runs_root: Path,
+    *,
+    vault_purpose: str | None = None,
 ) -> Path:
-    """Walk forward over delivery days first..last; write an immutable run record."""
+    """Walk forward over delivery days first..last; write an immutable run record.
+
+    Without `vault_purpose`, delivery days inside the vault are refused and actuals are
+    scored as known just before the vault boundary. With it, the run opens the vault itself:
+    one logged opening per run, never shared between runs (D-031)."""
     started_at = datetime.now(UTC)
+    if vault_purpose is None and delivery_span(last, last)[1] > store.vault_start:
+        raise VaultSealed(
+            f"delivery day {last} is inside the vault (sealed from "
+            f"{store.vault_start.isoformat()}); a vault run needs vault_purpose citing D-nnn"
+        )
+    vault = store.open_vault(vault_purpose) if vault_purpose else None
+    scored_at = started_at if vault else min(started_at, store.vault_start - timedelta.resolution)
     days = _days(first, last)
-    forecasts = _decide(store, model, days)
-    bench = _decide(store, Naive(zones), days)  # always recomputed, never reused from `model`
-    metrics = _score(store, started_at, forecasts, bench, zones, days)
+    forecasts = _decide(store, model, days, vault)
+    bench = _decide(store, Naive(zones), days, vault)  # always recomputed, never reused
+    metrics = _score(store, scored_at, forecasts, bench, zones, days, vault)
 
     run_id = f"{started_at:%Y%m%dT%H%M%S}-{model.name}-{uuid4().hex[:6]}"
     d = runs_root / run_id
@@ -109,7 +130,8 @@ def run_backtest(
         "last_delivery_day": last.isoformat(),
         "decision_cutoff": "11:30 Europe/Oslo on D-1",
         "benchmark": "naive",
-        "scored_as_of": started_at.isoformat(),
+        "scored_as_of": scored_at.isoformat(),
+        "vault_opening": vault.record() if vault else None,
         "git_sha": _git_sha(),
     }
     (d / "config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")

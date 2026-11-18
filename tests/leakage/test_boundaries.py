@@ -17,6 +17,7 @@ GUARDED = [SRC / Path(*m.split(".")) for m in CONTRACT["source_modules"]]
 DIRECT_DATA_ACCESS = re.compile(
     r"\bopen\(|\bio\.open|pl\.(read|scan)_|\bpd\.read_|pickle|shelve|\bglob\b|listdir|os\.walk"
     r"|\bPath\b|[\"']data[/\\]|\bStore\b|\._store\b|\._parts\b|importlib|__import__"
+    r"|\bKnowledgeView\(|(?i:vault)|_issued"  # building a view or touching the vault (D-031)
 )
 
 
@@ -57,6 +58,9 @@ def test_the_data_access_check_catches_typical_leaks():
         "Path.cwd()",
         'importlib.import_module("nordpower.curate")',
         '__import__("nordpower.curate")',
+        "KnowledgeView(view._store, t, sealed_from=None)",
+        "view.vault_start = far_future",
+        "VaultToken('D-031', now)",
     ]:
         assert DIRECT_DATA_ACCESS.search(leak), leak
     assert not DIRECT_DATA_ACCESS.search("from nordpower.store import KnowledgeView")
