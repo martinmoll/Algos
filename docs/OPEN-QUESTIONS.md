@@ -22,6 +22,8 @@ Decisions only you can make. Each has a recommended answer that the plan current
 
 **Status 2026-11-17:** ENTSO-E account registered and API access email sent; awaiting approval (up to 3 working days). Then generate the token under My Account Settings and put it in `.env` as `ENTSOE_API_TOKEN`. Fingrid key and UMM registration still open.
 
+**Status 2026-11-18:** ENTSO-E token received and stored in `.env` as `ENTSOE_API_TOKEN`; verified with an A44 DK1 query for 2024-01-15 (HTTP 200, prices identical to Energi Data Service). ENTSO-E done. Fingrid key and UMM registration still open.
+
 ---
 
 ❓ **Q4 — Data budget.** Intraday prices (trades, order book, IDA) and futures/EPAD settlements are paid data (Nord Pool products roughly €1.7–4k+/year each; Euronext separately). Without them, strategies S3 (intraday) and S4 (futures) can only start from self-collected forward data.
