@@ -89,10 +89,10 @@ A PC that is off loses vintages. Recommendation: a small always-on host (cheap V
 
 ## 5. Data quality gates
 
-Run on every ingest; failures are visible on the dashboard's Data Health page and block downstream backtests on affected ranges:
+Run at curation, once per raw snapshot (D-033); failures are visible on the dashboard's Data Health page and block downstream backtests on affected ranges:
 
 - Completeness per zone-day (expected MTU count, DST days = 92/100 quarter-hours).
-- Range and unit checks (price bounds: harmonised min/max −500/+4000 EUR/MWh ⚠️).
+- Range and unit checks (price bounds: SDAC reference harmonised limits −500/+4000 EUR/MWh, adjusted automatically when prices pass 70% of a limit ✅ ACER Decision 02/2026 Annex I Art. 3–4, checked 2026-11-18; bounds live in `configs/quality.toml`, D-033).
 - Cross-source reconciliation (ENTSO-E vs Energi Data Service DA prices must match to the cent).
 - Revision tracking: when a re-pull differs from an earlier snapshot, both are kept and the diff is counted — this *measures* how wrong the "assumed" backfill could be.
 - Timestamp sanity: `knowledge_time >= ` earliest physically possible time; no forecast with knowledge time after its valid time.

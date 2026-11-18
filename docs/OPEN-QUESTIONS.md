@@ -73,3 +73,9 @@ Decisions only you can make. Each has a recommended answer that the plan current
 ❓ **Q11 — Stack sign-off.** Python 3.12 + uv + Polars + DuckDB/Parquet + LightGBM/PyTorch + Streamlit, no orchestrator or MLflow initially. (D-010 – D-012)
 
 ➡️ Yes.
+
+---
+
+❓ **Q12 — Quality checks over the vault.** Curation stores vault-period data, so the data-quality checks run on it too and `nordpower curate` prints pass/fail counts for vault zone-days. CLAUDE.md says no statistics on the vault without a decision-log entry. Are integrity checks exempt? They report only completeness, duplicates and prices outside the hard market limits, with no price values. (D-033)
+
+➡️ Yes, exempt. They describe delivery, not outcomes, and a vault gap must be visible before the one-time vault evaluation runs.

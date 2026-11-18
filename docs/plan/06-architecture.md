@@ -40,7 +40,7 @@ EnergyTrading/
 │   ├── ingest/                # one module per source; writes raw snapshots only
 │   │   ├── energidataservice.py  entsoe.py  esett.py  nve.py
 │   │   ├── openmeteo.py  jao.py  fingrid.py  umm.py
-│   ├── curate/                # raw → typed curated tables, quality gates, cross-source reconciliation
+│   ├── curate.py / quality.py  # raw → typed curated tables; quality checks per snapshot (D-033)
 │   ├── features/              # declarative feature specs; computed only from a KnowledgeView
 │   ├── models/                # naive.py lear.py gbm.py dnn.py prob/ tsfm.py ensemble.py
 │   ├── strategies/            # decide(view, t) -> forecasts + orders
@@ -56,6 +56,7 @@ EnergyTrading/
 ├── data/                      # git-ignored
 │   ├── raw/<source>/<dataset>/…parquet      # append-only snapshots
 │   ├── curated/<dataset>/…parquet           # bitemporal tables
+│   ├── quality/<dataset>/<snapshot>.json    # one quality record per raw snapshot (D-033)
 │   ├── runs/<run_id>/                       # immutable run records
 │   └── live/commitments.jsonl               # hash chain
 └── docs/

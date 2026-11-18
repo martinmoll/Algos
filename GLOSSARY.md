@@ -18,6 +18,14 @@ _Avoid_: Interval, slot, period, hour (unless it really is an hour)
 The span of delivery days sharing one day-ahead MTU: the hourly era (to 2025-09-30) and the 15-minute era (from 2025-10-01). Backtest metrics are reported per era.
 _Avoid_: Regime (the regime calendar lists every market-design change; an era is defined by the MTU alone)
 
+**Zone-day**:
+One bidding zone on one delivery day; the unit that data-quality checks pass or fail.
+_Avoid_: Day (when the zone matters)
+
+**Quality record**:
+The data-quality result for one raw snapshot: which checks failed for which zone-days.
+_Avoid_: Quality flag, data health status
+
 **Delivery day**:
 The 24-hour local-time (CET/CEST) day in which electricity is delivered; has 23 or 25 hours on DST changes.
 _Avoid_: Trading day (that is the day the auction runs), date

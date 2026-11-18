@@ -86,3 +86,10 @@ def test_a_dataset_row_outside_its_era_is_rejected(tmp_path):
     (d / "s.json").write_text(json.dumps(snapshot), encoding="utf-8")
     with pytest.raises(ValueError, match="PT60M era"):
         curate_prices(tmp_path / "raw", Store(tmp_path))
+
+
+def test_the_recorded_market_data_passes_every_quality_check(data_dir):
+    records = list((data_dir / "quality" / "da_price").glob("*.json"))
+    assert len(records) == 2  # one per raw snapshot
+    for r in records:
+        assert json.loads(r.read_text(encoding="utf-8"))["failures"] == [], r.name

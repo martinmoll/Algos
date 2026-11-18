@@ -308,3 +308,41 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 **Revisit if:**
 - The intra-hour shape model (D-015) lands: the naive benchmark then stays hourly-flat by design.
 - A source publishes mixed resolutions within a day.
+
+## D-033 — Data-quality checks on day-ahead prices: per snapshot, reported not dropped
+
+2026-11-18 · provisional · agent
+
+**Context.** Ticket #8. Bad data must be visible before it reaches a model (plan 02 §5).
+
+**Decision.**
+- Curate checks each raw snapshot's `da_price` rows before storing them, per zone and delivery day:
+  - **completeness:** the set of event times must equal the delivery day's MTUs from the time module (23/24/25 hours, 92/96/100 quarter-hours). This also catches rows off the MTU grid, such as hourly rows in the 15-minute era. A null price counts as a missing MTU. Every zone-day the snapshot's request asked for (the zones in its filter and the days its start and end span) is checked, so a zone or day the source left out entirely also fails.
+  - **duplicate:** an event time appears more than once in a snapshot. Checked before `Store.append`, which would otherwise keep the last row silently.
+  - **range:** a price outside `configs/quality.toml` bounds, which are the SDAC reference limits −500/+4000 EUR/MWh (✅ ACER Decision 02/2026 Annex I Art. 3, checked 2026-11-18), or NaN.
+- Checks report and never drop or change data. A failing snapshot is still stored.
+- One quality record per raw snapshot, at `data/quality/da_price/<snapshot>.json`, written once. It holds the failures (check, zone, delivery day, detail) and the snapshot's `ingested_at`. Every snapshot gets one, even an all-null one. Details give counts and times, never prices.
+- **Vault (provisional, OPEN-QUESTIONS Q12).** The checks also run over vault-period snapshots, because curation has to store them. That is allowed without a decision-log entry, on the grounds that the checks reveal nothing about genuine outcomes:
+  - Completeness and duplicates are about delivery, not price.
+  - The range bounds are the hard market limits, so only bad data fails them.
+  - No price value is recorded.
+- `nordpower curate` prints one line per zone: zone-days checked, how many failed, by check. A zone-day counts as checked by the latest snapshot holding it, so a later complete download clears an earlier gap in the summary. Older records keep the history.
+
+**Why.**
+- Per-snapshot records match how data arrives, and they never need rewriting because snapshots never change.
+- Reporting rather than dropping keeps the append-only store the full truth. Blocking belongs to the consumer that knows its decision time.
+
+**Alternatives rejected.**
+- Dropping failing rows at curation: the data is lost, and dropping on outcomes is leak L17.
+- A single rolling quality table: it needs rewriting, or a vintage scheme of its own.
+
+**Cost / follow-up.**
+- The SDAC limits move automatically (Art. 4). A range failure means either bad data or a moved limit, and the config must be updated when NEMOs announce a change.
+- Range bounds are the hard market limits, so a genuine price can never fail them. Blocking on range failures cannot become a filter on extreme outcomes (L17), as long as the bounds stay the market limits.
+- Later phases that block ranges must use only quality records with `ingested_at` at or before their decision time.
+- Not built yet (plan 02 §5): cross-source reconciliation (ENTSO-E vs Energi Data Service), timestamp sanity, revision counting. They wait until a second price source is ingested.
+- Quality records are not re-written when check logic changes. Records made by old logic stay as they were.
+
+**Revisit if:**
+- NEMOs move a harmonised limit.
+- The dashboard's Data Health page needs a query-friendlier format.

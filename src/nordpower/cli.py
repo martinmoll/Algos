@@ -49,7 +49,13 @@ def main(argv: list[str] | None = None) -> None:
         dataset = next(d for d in PRICE_DATASETS if d.lower() == a.dataset)
         print(fetch_prices(dataset, raw, *delivery_span(a.start, a.end), a.zones))
     elif a.cmd == "curate":
-        print(f"curated {curate_prices(raw, store)} da_price rows")
+        stored, quality = curate_prices(raw, store)
+        print(f"curated {stored} da_price rows")
+        for zone, result in quality.items():
+            by_check = sorted(result["by_check"].items())
+            checks = ", ".join(f"{check} {count}" for check, count in by_check)
+            failed = f"{result['failed']} failed" + (f" ({checks})" if checks else "")
+            print(f"{zone}: {result['zone_days']} zone-days checked, {failed}")
     elif a.cmd == "backtest":
         run_dir = run_backtest(store, Naive(a.zones), a.zones, a.start, a.end, a.data_dir / "runs")
         print(run_dir)

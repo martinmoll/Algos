@@ -1,0 +1,12 @@
+# Data-quality bounds (D-033). A price outside them is reported, never dropped.
+#
+# SDAC harmonised clearing-price limits: reference +4000 / -500 EUR/MWh, ACER Decision
+# 02/2026 Annex I Art. 3 (checked 2026-11-18). Art. 4 moves them automatically (+500 to the
+# maximum, -100 to the minimum) after repeated prices beyond 70% of a limit, announced 21 days
+# ahead. A range failure therefore means bad data OR a moved limit: check which, then update
+# here with a decision-log entry.
+
+[da_price]
+price_min = -500.0
+price_max = 4000.0
+reviewed = "2026-11-18, D-033"

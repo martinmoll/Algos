@@ -79,7 +79,8 @@ def _score(
             "rmae": mae / bench_mae if mae is not None and bench_mae else None,  # type: ignore[operator]
         }
 
-    # ponytail: MTUs missing a forecast or an actual are only counted, not flagged; ticket #8
+    # ponytail: MTUs missing a forecast or an actual are only counted here; quality records
+    # (D-033) say which zone-days are bad, and blocking on them comes with the first consumer
     out = {}
     for zone in zones:
         z = joined.filter(pl.col("zone") == zone)
