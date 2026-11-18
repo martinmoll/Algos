@@ -311,7 +311,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-033 — Data-quality checks on day-ahead prices: per snapshot, reported not dropped
 
-2026-11-18 · provisional · agent
+2026-11-18 · accepted (user confirmed 2026-11-18: quality checks are exempt over the vault, Q12) · agent
 
 **Context.** Ticket #8. Bad data must be visible before it reaches a model (plan 02 §5).
 
@@ -322,7 +322,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
   - **range:** a price outside `configs/quality.toml` bounds, which are the SDAC reference limits −500/+4000 EUR/MWh (✅ ACER Decision 02/2026 Annex I Art. 3, checked 2026-11-18), or NaN.
 - Checks report and never drop or change data. A failing snapshot is still stored.
 - One quality record per raw snapshot, at `data/quality/da_price/<snapshot>.json`, written once. It holds the failures (check, zone, delivery day, detail) and the snapshot's `ingested_at`. Every snapshot gets one, even an all-null one. Details give counts and times, never prices.
-- **Vault (provisional, OPEN-QUESTIONS Q12).** The checks also run over vault-period snapshots, because curation has to store them. That is allowed without a decision-log entry, on the grounds that the checks reveal nothing about genuine outcomes:
+- **Vault (accepted, OPEN-QUESTIONS Q12).** The checks also run over vault-period snapshots, because curation has to store them. That is allowed without a decision-log entry, on the grounds that the checks reveal nothing about genuine outcomes:
   - Completeness and duplicates are about delivery, not price.
   - The range bounds are the hard market limits, so only bad data fails them.
   - No price value is recorded.

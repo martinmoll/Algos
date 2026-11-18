@@ -79,3 +79,4 @@ Decisions only you can make. Each has a recommended answer that the plan current
 ❓ **Q12 — Quality checks over the vault.** Curation stores vault-period data, so the data-quality checks run on it too and `nordpower curate` prints pass/fail counts for vault zone-days. CLAUDE.md says no statistics on the vault without a decision-log entry. Are integrity checks exempt? They report only completeness, duplicates and prices outside the hard market limits, with no price values. (D-033)
 
 ➡️ Yes, exempt. They describe delivery, not outcomes, and a vault gap must be visible before the one-time vault evaluation runs.
+**Status 2026-11-18:** closed. The user confirmed: quality checks are exempt over the vault. D-033 accepted.
