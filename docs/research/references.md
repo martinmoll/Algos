@@ -28,6 +28,17 @@ Research performed 2026-11-16. **Verified** = found and read (at least the abstr
 - Energy-Charts API — [api.energy-charts.info](https://api.energy-charts.info/). Live call: price responses carry "private and internal use only" licence text.
 - Nord Pool data — [Data services general terms](https://www.nordpoolgroup.com/498e4c/globalassets/download-center/power-data-services/general-terms-data-services-data.pdf), [day-ahead data products](https://www.nordpoolgroup.com/en/services/power-market-data-services/day-ahead-market-data/); historical data removed from the public site Jan 2022 — [operational message](https://nordpoolgroup.com/en/trading/Operational-Message-List/2022/01/new-data-portal-for-2022-20220114124600).
 
+## TSO methods and weather/satellite sources (checked 2026-11-24, by web search)
+
+Existence and headline facts checked; formulas inside not yet read — see the ⚠️ marks in [plan 09](../plan/09-tso-methods.md) and [plan 10](../plan/10-weather-and-satellite.md).
+
+- eSett NBS Handbook, current v5.4 (June 2026) — [v5.4 PDF](https://www.esett.com/app/uploads/2026/06/NBS-Handbook-v5.4.pdf), [handbook page](https://www.esett.com/handbook/). Mentions an optional incentivising component in the imbalance price.
+- Fingrid, *Imbalance price in Finland from 1.6.2026* — [PDF](https://www.fingrid.fi/globalassets/dokumentit/fi/sahkomarkkinat/tasesahko/imbalance-price-in-finland-1.6.2026.pdf); mFRR marginal pricing — [Fingrid mFRR page](https://www.fingrid.fi/en/electricity-market/reserves/reserve-products/balancing-energy-and-balancing-capacity-markets-mfrr/). Formula summarised from a search result only; read §16 before coding.
+- Energinet, Q&A on Nordic imbalance pricing — [PDF](https://energinet.dk/media/x3zikzb5/questions-and-answers-to-nordic-imbalance-pricing-webinar.pdf).
+- Nordic CCR capacity calculation methodology (approved; Art. 15 describes RAM) — [ACER, approved amended proposal](https://acer.europa.eu/en/Electricity/MARKET-CODES/CAPACITY-ALLOCATION-AND-CONGESTION-MANAGEMENT/16%20CCM%20%20%20Aprroved/Action%204%20-%20CCM%20Nordic%20amended%20proposal%20approved.pdf), [explanatory document](https://www.acer.europa.eu/en/Electricity/MARKET-CODES/CAPACITY-ALLOCATION-AND-CONGESTION-MANAGEMENT/16%20CCM/Action%201%20-%20CCM%20Nordic%20explanatory%20docuement.pdf). JAO handbook abbreviations (Fmax, FRM, AMR, GSK, RAM) — [Nordic Publication Handbook](https://parallelrun-publicationtool.jao.eu/nordic/home/Nordic_PublicationHandbook).
+- CAMS solar radiation time-series (GHI, BHI, DHI, BNI from 2004; all-sky within Meteosat field of view; ~100 requests/day; McClear clear-sky free) — [ECMWF/CAMS documentation](https://confluence.ecmwf.int/spaces/CKB/pages/266592908/CAMS+solar+radiation+time-series+data+documentation), [CAMS solar services](https://atmosphere.copernicus.eu/solar-radiation-services-0), [CAMS radiation service](https://cams.xweather.com/).
+- EUMETSAT data policy (some data CC BY 4.0, "recommended" data licensed; low-latency licence bars redistribution) — [Data Policy 2026](https://www-cdn.eumetsat.int/files/2026-01/45173%20-%20Data_Policy.pdf); MTG FCI Level 1c in the Data Store — [EUMETrain MTG data access](https://resources.eumetrain.org/data/7/727/MTG-EW/LectureSlides/MTG_Data%20Access_EUMETrain.pdf). Licence of FCI products specifically not confirmed.
+
 ## Forecasting literature (verified)
 
 - Lago, Marcjasz, De Schutter, Weron (2021). *Forecasting day-ahead electricity prices: A review of state-of-the-art algorithms, best practices and an open-access benchmark.* Applied Energy 293, 116983. [arXiv:2008.08004](https://arxiv.org/abs/2008.08004). Code: [epftoolbox](https://github.com/jeslago/epftoolbox) (LEAR, DNN, DM and GW tests, Nord Pool benchmark dataset).
@@ -69,3 +80,8 @@ Research performed 2026-11-16. **Verified** = found and read (at least the abstr
 - MET Norway MEPS forecast archive (thredds) depth and access pattern.
 - Current Nord Pool fee schedule numbers for the cost model.
 - Hydrology data for Sweden/Finland (inflow, snow).
+- Text of Nordic CCM Art. 15 (RAM formula) and the NBS Handbook imbalance price chapter (plan 09).
+- TSO load and wind/solar forecast methodology notes per TSO (plan 09 §2.3–2.4).
+- NWP run availability times per model, measured from our own snapshots (plan 10 §2).
+- Installed wind/solar capacity registers per zone with commissioning dates (plan 10 §3).
+- Copernicus Land snow products and their latency/licence (plan 10 §4).

@@ -23,9 +23,13 @@ uv run nordpower backtest --start 2025-09-08 --end 2025-09-21              # run
 
 Dates are delivery days. Data lives in `data/` (git-ignored). Energi Data Service rate-limits `Elspotprices` to about one request per 5 minutes; ingest waits automatically.
 
+## Learning track
+
+[docs/learn/](docs/learn/README.md) — a self-study path for the project owner: price formation → data quality → drivers and deltas → feature engineering → models → a paper trade. Data quality and features come before models (D-034).
+
 ## Read in this order
 
-1. [Open questions](docs/OPEN-QUESTIONS.md) — 11 decisions waiting for you, each with a default
+1. [Open questions](docs/OPEN-QUESTIONS.md) — decisions waiting for you, each with a default
 2. [Decision log](docs/DECISIONS.md) — what was decided and why
 3. Plan
    - [01 Markets and strategies](docs/plan/01-markets-and-strategies.md)
@@ -36,5 +40,7 @@ Dates are delivery days. Data lives in `data/` (git-ignored). Energi Data Servic
    - [06 Architecture and repository layout](docs/plan/06-architecture.md)
    - [07 Dashboard](docs/plan/07-dashboard.md)
    - [08 Roadmap](docs/plan/08-roadmap.md)
+   - [09 TSO methods](docs/plan/09-tso-methods.md)
+   - [10 Weather and satellite data](docs/plan/10-weather-and-satellite.md)
 4. [References](docs/research/references.md)
 5. [Glossary](GLOSSARY.md) · [Agent rules](CLAUDE.md)

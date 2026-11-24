@@ -346,3 +346,52 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 **Revisit if:**
 - NEMOs move a harmonised limit.
 - The dashboard's Data Health page needs a query-friendlier format.
+
+## D-034 — Data quality and feature engineering before model complexity
+
+2026-11-24 · provisional · agent (on the user's direction, 2026-11-24)
+
+**Context.** The user asked that data quality stay at the forefront, and that good features rather than complicated models be the main route to results. Plan 04 already ranks models as a ladder; it did not say where effort goes between rungs.
+
+**Decision.**
+- A model rung above M1 (LEAR) is only worked on once M1 runs on the feature set that the current data supports, and every dataset it reads has quality checks (plan 02 §5) whose failures have been looked at.
+- Each feature family enters through an ablation on a fixed simple model (LEAR, or a small LightGBM): walk-forward rMAE per family added, with run ids. A family is kept only if the gain is significant (Diebold–Mariano). Families that do not help are recorded here as null results.
+- When a complex model beats a simple one, the next step is to find what it exploited and try to engineer that as a feature for the simple model, before promoting the complex one.
+- Features are stated as deltas where the naive forecast already carries the level (day-over-day, forecast revisions, deviation from normal); see `docs/learn/03-drivers-and-deltas.md`.
+
+**Why.** In the EPF literature a well-specified LEAR is the benchmark most complex models struggle to beat clearly (Lago et al. 2021, plan 04 §1). Most failures in power forecasting are data and timing errors, which a more complex model hides better. Simple models on explained features also make leaks easier to see.
+
+**Alternatives rejected.** Model-first exploration (try LightGBM/DNN on raw inputs and see): fast to a number, slow to understanding, and the gains are hard to attribute or trust.
+
+**Revisit if** two years of walk-forward show complex models on raw inputs consistently and significantly beating LEAR/LightGBM on engineered features.
+
+## D-035 — Replicate TSO methods and model their residuals
+
+2026-11-24 · provisional · agent (on the user's direction, 2026-11-24)
+
+**Context.** TSOs and their bodies (eSett, JAO) publish the formulas behind imbalance prices, flow-based capacities and their forecasts. The user wants these used to understand the market and to find where they are weak.
+
+**Decision.** New plan document [09-tso-methods](plan/09-tso-methods.md). For each method: read the current document and log its version and effective date in the regime calendar; replicate the published value from published inputs as of the TSO's decision time; measure the residual of TSO forecasts vs outcomes; turn explained residuals into features, which then go through the normal ladder (D-034). Priorities: imbalance price (S2), flow-based domain (S1/S5), TSO load and wind/solar forecast errors (S1).
+
+**Why.** A number we can recompute is a number we can forecast and audit. Replication is also a data-quality check: failing to reproduce a TSO's own number from its own inputs exposes our data bugs. Known assumptions (fixed margins, generation shift keys, stale capacity registers, one weather model) give predictable errors.
+
+**Alternatives rejected.** Treating TSO outputs only as black-box features: loses the structure (e.g. the imbalance price's step on activation direction) and the audit.
+
+**Revisit if** replication turns out impossible for a method because inputs are not published; then record it as a null result.
+
+## D-036 — Weather and satellite data: NWP for day-ahead, satellite for nowcasting, labels and snow
+
+2026-11-24 · provisional · agent (on the user's direction, 2026-11-24)
+
+**Context.** The user asked how satellite data can improve wind and solar prediction, and how this works at day-ahead granularity.
+
+**Decision.** New plan document [10-weather-and-satellite](plan/10-weather-and-satellite.md).
+- Day-ahead weather inputs are NWP forecast runs available before the decision cutoff; satellite data reaches them through the weather models' data assimilation.
+- Satellite data is used directly for: (a) solar nowcasting at 0–6 h for S2/S3/S6; (b) satellite-derived irradiance history (CAMS) as training labels and to measure NWP error on past days, never as a delivery-period input; (c) snow cover/snow water for hydro and S4.
+- Our own wind and solar MW forecasts (power curves, clear-sky index, installed capacity as of t) enter as features expressed as deltas vs the TSO forecast, and stay only if they beat it walk-forward.
+
+**Why.** A raw satellite image of today says little about clouds 12–36 hours ahead that NWP does not already contain. The value of satellites is at short horizons, as ground truth, and for slow hydrology states.
+
+**Alternatives rejected.** Building a satellite-image deep model for day-ahead solar: large effort, weak expected gain over NWP at that horizon, and poor geostationary coverage at Nordic latitudes.
+
+**Revisit if** a day-ahead solar error analysis shows NWP irradiance is the dominant error in DK/SE4 prices and a satellite-informed product beats it.

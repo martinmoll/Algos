@@ -81,3 +81,10 @@ Decisions only you can make. Each has a recommended answer that the plan current
 ➡️ Yes, exempt. They describe delivery, not outcomes, and a vault gap must be visible before the one-time vault evaluation runs.
 
 **Status 2026-11-18:** closed. The user confirmed: quality checks are exempt over the vault. D-033 accepted.
+
+---
+
+❓ **Q13 — Satellite and solar-radiation registrations.** Satellite-derived irradiance (CAMS radiation service via SoDa) and raw Meteosat/MTG imagery (EUMETSAT Data Store) need free registrations, with licence terms per product. CAMS history is useful from Phase 2 (training labels for the solar model); EUMETSAT imagery only for intraday/imbalance nowcasting in Phase 5. (D-036, plan 10)
+
+➡️ Register for CAMS/SoDa when Phase 2 solar work starts; defer EUMETSAT until Phase 5. Neither blocks Phase 1.
+

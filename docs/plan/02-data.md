@@ -30,6 +30,9 @@ Two consequences drive the whole plan:
 | **Nord Pool REMIT UMM** | Urgent market messages: outages of generation, consumption, transmission (via NUCS) | Free API for registered users ✅; public RSS | Each message has a **publication timestamp and version history** → natively bitemporal | The cleanest PIT source we have. Nuclear and interconnector outages are first-order price drivers |
 | **MET Norway Frost / thredds**, **SMHI**, **FMI**, **DMI** open data | Observations; MET Nordic (MEPS) forecast archive on thredds | Free | MEPS archive files are per-run → **observed** vintages further back than 2024 ⚠️ | Use if we need pre-2024 forecast vintages for NO/SE/FI |
 | **ECMWF Open Data** | IFS/AIFS real-time forecasts (0.25°), rolling window | Free, CC BY 4.0 ⚠️ | Observed when snapshotted live | Alternative to Open-Meteo for live collection without licence concerns |
+| **CAMS solar radiation** (Copernicus, via SoDa) | Satellite-derived GHI/DHI/BNI time series from 2004, all-sky within the Meteosat field of view; McClear clear-sky | Free registration; all-sky about 100 requests/day ✅ (CAMS docs, 2026-11-24) | Realised values → **training labels and NWP-error measurement only**, never a delivery-period input | See [10](10-weather-and-satellite.md) §4; Q13 |
+| **EUMETSAT Data Store** | Meteosat / MTG FCI imagery (Level 1c listed ✅ 2026-11-24) | Free registration ⚠️; licence per product (some CC BY 4.0, low-latency data restricted ✅ data policy) | Observed when snapshotted live | Only for 0–6 h solar nowcasting (S2/S3/S6), Phase 5; Q13 |
+| **TSO methodology documents** | NBS Handbook (eSett, v5.4 June 2026 ✅), national imbalance price notes, Nordic CCM, JAO handbook | Public PDFs | Each version has an effective date → regime calendar | Not data rows but rules to replicate — [09](09-tso-methods.md) |
 | **Fuel/carbon** | TTF gas, EUA carbon, API2 coal front-month closes | No clean free API. Candidates: ENTSOG (gas flows, free), Yahoo/stooq-style delayed quotes ⚠️, EEX end-of-day pages | Daily settlement known after close → knowledge time = close + lag | Matters mostly for DK1/DK2/SE4/NO2 and futures; second priority |
 
 ### Tier 2 — paid or restricted (decide later)
@@ -68,6 +71,9 @@ Each row becomes one curated table. `zone` uses our canonical zone ids; all time
 | `reservoir` | zone × week | NVE (NO), ENTSO-E (SE, FI) | — |
 | `weather_forecast` | grid point/zone aggregate × valid time × run | Open-Meteo / MEPS / ECMWF | — |
 | `weather_obs` | station/grid × hour | ERA5 / national met services | Only for *lagged* features and forecast-error learning |
+| `irradiance_sat` | grid point/zone aggregate × 15 min | CAMS radiation service | Labels and NWP-error learning only (D-036) |
+| `res_capacity` | zone × technology × day | TSO/registry lists ⚠️ | Installed wind/solar capacity *as of t*, for power models and TSO-error analysis |
+| `tso_forecast_error` | zone × MTU × vintage (view) | Derived: TSO forecast vs actual | Residual analysis (D-035); actual side is lagged-only |
 | `fuel_carbon` | product × day | TBD | — |
 | `futures_settlement` | contract × day | Euronext (TBD) | — |
 | `calendar` | zone × day | Generated (holidays per country, DST, regime calendar) | — |

@@ -20,6 +20,9 @@ Phases are ordered so that (a) irreplaceable live vintages start accumulating as
 - Curate + quality gates + reconciliation.
 - **Scheduled live collectors** + backup. *Start the moment the store exists — do not wait for the rest of the phase.*
 - Dashboard v0: Data health + Integrity pages.
+- Quality checks for every new dataset at ingest time (completeness, duplicates, ranges, plausibility), plus cross-source reconciliation and revision counting once a second source exists (D-034).
+- TSO method documents logged with versions and effective dates in the regime calendar ([09](09-tso-methods.md)).
+- Live NWP snapshots at park and population points (deterministic + ensemble), and dated installed-capacity lists ([10](10-weather-and-satellite.md)).
 
 **Exit:** all Tier-1 datasets backfilled (assumed vintage) and collecting live (observed vintage) for 12 zones; health page green for 2 consecutive weeks.
 
@@ -27,7 +30,8 @@ Phases are ordered so that (a) irreplaceable live vintages start accumulating as
 
 ## Phase 2 — Day-ahead forecasting benchmark
 
-- Feature library v1 (declarative specs).
+- Feature library v1 (declarative specs). Built and ablated on LEAR first (D-034): price lags → calendar → residual-load deltas → TSO forecast errors/revisions → hydro → cross-zone.
+- Own wind/solar/load models from NWP (power curves, clear-sky index), entered as deltas vs TSO forecasts; CAMS irradiance as labels ([10](10-weather-and-satellite.md)).
 - M0 naive, M1 LEAR, M2 LightGBM, M3 DNN for 12 zones + system price, hourly.
 - Evaluation module (rMAE, DM, GW) validated against `epftoolbox` on its public Nord Pool dataset — proves our harness reproduces published numbers.
 - Dashboard: Market explorer, Forecast evaluation, Run comparison.
@@ -54,7 +58,8 @@ Phases are ordered so that (a) irreplaceable live vintages start accumulating as
 
 - Execution simulators + cost profiles.
 - S6 battery benchmark (forecast value in EUR).
-- S2 DA↔imbalance research.
+- S2 DA↔imbalance research, starting from an imbalance-price replica per country ([09](09-tso-methods.md) §2.1).
+- Satellite nowcasting for S2/S3/S6; snow products for S4 ([10](10-weather-and-satellite.md) §4).
 - S3 DA↔intraday (if data: Q4). S4 futures/EPAD (if data: Q4).
 - Trial registry statistics: DSR, PBO, SPA. Dashboard: Backtest page.
 
