@@ -75,6 +75,31 @@ _Avoid_: Lag day, source day
 Demand minus wind, solar and other must-run generation; what dispatchable plants must cover.
 _Avoid_: Net load, net demand
 
+**Water value**:
+The opportunity cost of using stored hydro water now rather than later; the marginal cost of reservoir hydro.
+_Avoid_: Hydro cost, fuel cost
+
+**Delta**:
+The difference between a driver's value for the target period and its value in a comparison: the reference day, an earlier forecast vintage, or a seasonal normal. Features are stated as deltas where the naive forecast already carries the level (D-034).
+_Avoid_: Diff; say what the comparison is (vs reference day, vs earlier vintage, vs normal)
+
+**Forecast revision**:
+A delta between two vintages of the same forecast for the same event time, e.g. the latest wind forecast minus the day-ahead vintage.
+_Avoid_: Update, forecast change
+
+**TSO forecast error**:
+A TSO's published forecast minus the realised value for the same event time; studied to find systematic weaknesses (plan 09). The realised side is only ever a lagged input.
+
+**Replica**:
+Our recomputation of a published TSO value (imbalance price, flow-based RAM) from its published inputs, as of the TSO's own decision time.
+_Avoid_: Clone, simulation
+
+**Clear-sky index**:
+Forecast or observed irradiance divided by the irradiance under a cloudless sky at the same place and time; isolates the effect of clouds.
+
+**Nowcasting**:
+Forecasting the next 0–6 hours from the latest observations (e.g. satellite cloud motion) rather than from a weather-model run. Not a day-ahead input.
+
 ### Point-in-time discipline
 
 **Event time**:

@@ -1,6 +1,8 @@
 # 04 — Models
 
-A ladder. Each rung must beat the one below it under the [05-backtesting](05-backtesting.md) protocol to earn its complexity. Citations are in [references](../research/references.md); ✅ = verified there, ⚠️ = from memory.
+A ladder. Each rung must beat the one below it under the [05-backtesting](05-backtesting.md) protocol to earn its complexity.
+
+**Data and features first (D-034).** Effort goes to data quality and feature engineering before model complexity: a rung above M1 is worked on only once LEAR runs on the feature set the current data supports, with quality checks on every input. Feature families enter by ablation on a fixed simple model, and a complex model's gain is first chased as a feature for the simple one. TSO-method residuals ([09](09-tso-methods.md)) and weather-derived wind/solar forecasts ([10](10-weather-and-satellite.md)) enter as features, usually as deltas vs the TSO forecast. Citations are in [references](../research/references.md); ✅ = verified there, ⚠️ = from memory.
 
 ## 1. What the literature says works (summary)
 

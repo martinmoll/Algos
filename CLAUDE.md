@@ -15,6 +15,7 @@ The full contract is [docs/plan/03-no-lookahead.md](docs/plan/03-no-lookahead.md
 - The vault period is sealed. Do not read it, plot it or compute statistics on it without an explicit decision-log entry.
 - Every backtest is a recorded run; quote results only with their run id. Do not delete run records.
 - A result that looks too good is a bug report, not a finding.
+- Data quality and features before model complexity (D-034): a new dataset gets quality checks before any model reads it; a feature family enters by ablation on a simple model.
 
 ## Working rules
 
@@ -42,5 +43,6 @@ Single-context: root `GLOSSARY.md`, decisions in `docs/DECISIONS.md` (no `docs/a
 
 ## Map
 
-- [docs/plan/](docs/plan/) — markets, data, no-look-ahead contract, models, backtesting, architecture, dashboard, roadmap
+- [docs/plan/](docs/plan/) — markets, data, no-look-ahead contract, models, backtesting, architecture, dashboard, roadmap, TSO methods (09), weather and satellite (10)
+- [docs/learn/](docs/learn/) — the owner's learning track. Agents may improve it when asked, but must not fill in the owner's journal or estimate tables for them
 - [docs/research/references.md](docs/research/references.md) — sources, with verified/unverified status
