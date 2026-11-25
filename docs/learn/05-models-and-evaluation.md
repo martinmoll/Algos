@@ -36,7 +36,7 @@ Start with M0 and M1. Spend your time on modules 2–4 until M1 on good features
 
 ## 4. Exercises
 
-1. **Run the skeleton.** `uv run nordpower backtest --start 2024-03-01 --end 2024-03-31` (after ingesting and curating that range). Open the run record in `data/runs/`. Find: run id, config, model rule, metrics per era. Confirm rMAE = 1.00 and explain why.
+1. **Run the skeleton.** `uv run nordpower backtest --start 2024-03-01 --end 2024-03-31` (after ingesting and curating from 2024-02-23, so the naive forecast has its reference days a week back). Open the run record in `data/runs/`. Find: run id, config, model rule, metrics per era. Confirm rMAE = 1.00 and explain why.
 2. **Read the decisions behind it.** D-028 and D-032 in [DECISIONS.md](../DECISIONS.md): why only complete hours count, why scoring is per MTU.
 3. **Plant a leak.** In a scratch branch, make a model that uses the actual price of D as a feature. Run the leakage suite (`uv run pytest tests/leakage`). Which test fails? If none does, you have found a gap in the suite — write it down and raise an issue, because that is a real finding. Then delete the branch. Never merge it.
 4. **Significance by hand.** Once two models exist: compute the daily loss differential, its mean and its standard error. Is the mean more than two standard errors from zero? That is the intuition behind DM.

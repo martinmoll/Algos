@@ -81,7 +81,7 @@ _Avoid_: Hydro cost, fuel cost
 
 **Delta**:
 The difference between a driver's value for the target period and its value in a comparison: the reference day, an earlier forecast vintage, or a seasonal normal. Features are stated as deltas where the naive forecast already carries the level (D-034).
-_Avoid_: Change, diff (unless the comparison is named)
+_Avoid_: Diff; say what the comparison is (vs reference day, vs earlier vintage, vs normal)
 
 **Forecast revision**:
 A delta between two vintages of the same forecast for the same event time, e.g. the latest wind forecast minus the day-ahead vintage.

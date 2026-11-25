@@ -43,7 +43,7 @@ After results (≈13:00 CET) and after delivery: fill in realised prices, P&L af
 
 ## 4. Exercises
 
-1. **Ten tickets by hand.** For ten pre-vault days (e.g. in March 2025), write the ticket using only data available at 11:30 CET D-1 — use `store.as_of(<D-1 11:30 CET>)`. Then settle. This trains the habit of thinking at the decision time.
+1. **Ten tickets by hand.** For ten pre-vault days (e.g. in March 2025), write the ticket using only data available at 11:30 CET D-1 — use `store.as_of(decision_cutoff(D))`, with `decision_cutoff` from `nordpower.timeutil` (11:30 Oslo time on D-1). Do not build the instant by hand; time-zone arithmetic lives only in the time module. Then settle. This trains the habit of thinking at the decision time.
 2. **Battery against naive.** For the same days: what would the battery have earned using the naive forecast's shape? Using your judgement? Using perfect foresight? Your number divided by the perfect-foresight number is your *capture rate* — a far more honest measure than P&L alone.
 3. **Post-mortem on the worst day.** Which delta did you miss? Was the data there at 11:30? Was it a data-quality issue? Write it as a feature contract (module 4) if it was a missing variable.
 4. **Live, once Phase 4 exists.** One ticket a day, committed before cutoff. After 30 days, compare your forward record with the backtest on the same model.

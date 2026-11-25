@@ -39,7 +39,7 @@ Signs are for the zone's price when the driver goes up. Sizes are **for you to m
 
 ## 3. Exercises
 
-1. **Guess, then measure.** For DK1 in 2024: regress the day-over-day change in daily mean price on the day-over-day change in daily mean residual load. (Use actual load and wind *lagged* for now, or forecasts once ENTSO-E is ingested.) Compare the coefficient with your guess. Then repeat with levels instead of deltas. Which explains more (R²)? Write why.
+1. **Guess, then measure.** For DK1 in 2024: regress the day-over-day change in daily mean price on the day-over-day change in daily mean residual load. This first pass is an *after-the-fact explanation*, so it may use realised load and wind for day D; that is fine for understanding and never allowed as a model input. Once ENTSO-E is ingested, repeat it with the day-ahead forecasts available at the decision cutoff, which is the version a model could use. How much R² is lost? Compare the coefficient with your guess. Then repeat with levels instead of deltas. Which explains more (R²)? Write why.
 2. **Hour matters.** Do the same per clock hour. Where is the slope steepest? Link it to the stack.
 3. **Revision as news.** Once `Forecasts_Hour` is ingested: compute DayAhead − Intraday wind forecast for DK1. Is it centred on zero? Does it correlate with the DA→imbalance price spread? (Lagged data only.)
 4. **Hydro.** From NVE (when ingested): plot NO2 weekly reservoir deviation from median vs the weekly mean NO2 price. Use the *publication* Wednesday as the knowledge time, not the week.

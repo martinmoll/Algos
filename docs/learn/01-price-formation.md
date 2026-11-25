@@ -42,6 +42,8 @@ Demand is fairly inelastic in the short run. The price is where demand crosses t
    uv run nordpower curate
    ```
 
+   `Elspotprices` allows about one request per 5 minutes and ingest waits automatically, so a full year can take a while; start with a month if you are impatient.
+
    Then in a notebook, through `Store("data").as_of(...)`: plot the hourly profile by month, and the DK1−DK2 spread. When is the spread non-zero? Write your explanation in the journal.
 3. **Negative prices.** Find the hours in 2024 when DK1 was negative. Which hours of the day, which months, which weekdays? Predict the answer first.
 4. **Whiteboard test.** Explain to someone (or to Claude, in a session) why NO2 is usually closer to DK1 than NO4 is. If you need to look something up, note what.

@@ -46,7 +46,7 @@ features: residual load, deltas vs TSO forecast, ensemble spread  →  price mod
 | Wind speed | 100 m wind (or hub-height extrapolation) at each park | Power scales roughly with wind speed cubed up to rated speed |
 | Power curve | Empirical per zone: fit realised zone output vs capacity-weighted wind, on *lagged* data | Fit inside `model.fit` on the knowledge view (CLAUDE.md). A per-zone empirical curve beats a textbook curve because it absorbs wake losses and availability |
 | Features | Forecast capacity factor; our MW forecast; **delta vs TSO forecast**; ensemble spread; ramp (change hour to hour); icing risk flag (temperature near 0 °C and high humidity ⚠️); offshore vs onshore split | The delta vs TSO is often the strongest single feature: the market prices the TSO number, our better number is the information |
-| Pitfall | Curtailment at negative prices makes *realised* output depend on price. Train power curves on non-curtailed hours only, using a rule that does not look at the delivery price being forecast | Leak L17-type trap |
+| Pitfall | Curtailment at negative prices makes *realised* output depend on price. Fit power curves on past hours that were not curtailed, judged from prices and curtailment data known at fit time; the curve then predicts *available* output. Curtailment for the delivery day is a separate step that depends on the price forecast, never on the realised price | Leak L17-type trap |
 
 ### 3.2 Solar
 
