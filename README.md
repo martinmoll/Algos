@@ -1,6 +1,6 @@
 # EnergyTrading
 
-Algorithmic and machine-learning trading research for the Nordic power markets — Norway, Sweden, Denmark and Finland (12 bidding zones) — built around one rule: **no look-ahead, ever**.
+Backtesting and forecasting research (never real money, D-041) for the Nordic power markets — Norway, Sweden, Denmark and Finland (12 bidding zones) — built around one rule: **no look-ahead, ever**.
 
 Status: Phase 0 complete. The naive DK1/DK2 day-ahead backtest runs over 2015-01-08 → 2025-11-15 with rMAE 1.00, all look-ahead checks green and status ok (run 20261127T131921-naive-245114, D-039). Phase 1 (data platform and live collection) is next.
 

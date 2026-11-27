@@ -10,13 +10,15 @@ Decisions only you can make. Each has a recommended answer that the plan current
 
 **Status 2026-11-27:** closed. The user accepted the default: (d) research and a paper-trading record first; real access is decided when Phase 5 has verdicts.
 
+**Status 2026-11-27 (later):** superseded. There is no route to market: the project is backtesting research only and will never use real money (D-041).
+
 ---
 
 ❓ **Q2 — Capital and risk scale.** What size are we designing for (order of magnitude in MW or EUR at risk)? It sets price-impact assumptions, whether fixed membership fees can ever be recovered, and position limits.
 
 ➡️ Assume small price-taker (≤ 1–5 MW per MTU, no market impact), revisited at Q1.
 
-**Status 2026-11-27:** closed. The user accepted the default: small price-taker, 1–5 MW per MTU, no market impact.
+**Status 2026-11-27:** closed. The user accepted the default: small price-taker, 1–5 MW per MTU, no market impact. With D-041 this is a notional size for cost and impact assumptions in backtests.
 
 ---
 
@@ -45,6 +47,8 @@ Decisions only you can make. Each has a recommended answer that the plan current
 ➡️ Personal research now; licences and regulatory review become a gate before any real-money trading. (D-017)
 
 **Status 2026-11-27:** closed. The user accepted the default: personal research; a licence and regulatory review gates any real-money trading.
+
+**Status 2026-11-27 (later):** superseded. Backtesting research only, never real money, so there is no regulatory gate (D-041).
 
 ---
 

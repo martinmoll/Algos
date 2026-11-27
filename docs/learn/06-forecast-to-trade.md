@@ -1,6 +1,6 @@
 # Module 6 — From forecast to trade
 
-Goal: turn a forecast into a decision you write down before gate closure, then settle it honestly afterwards. Paper first (D-003); real money only through Phase 6.
+Goal: turn a forecast into a decision you write down before gate closure, then settle it honestly afterwards. Paper only: this project never trades real money (D-041). The trades are simulated, with realistic costs, and scored honestly.
 
 ## 1. A forecast is not a trade
 
@@ -53,4 +53,4 @@ After results (≈13:00 CET) and after delivery: fill in realised prices, P&L af
 - Every trade was written before gate closure, with the inputs and their knowledge times.
 - Results are after costs, and compared with naive and perfect foresight.
 - Bad days are traced back to data, drivers or features — the loop in the [track overview](README.md) closes.
-- You would be comfortable showing the full ticket history to a BRP, a fund, or an employer.
+- You would be comfortable showing the full ticket history to anyone, losing days included.
