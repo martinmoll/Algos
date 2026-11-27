@@ -395,3 +395,33 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 **Alternatives rejected.** Building a satellite-image deep model for day-ahead solar: large effort, weak expected gain over NWP at that horizon, and poor geostationary coverage at Nordic latitudes.
 
 **Revisit if** a day-ahead solar error analysis shows NWP irradiance is the dominant error in DK/SE4 prices and a satellite-informed product beats it.
+
+## D-037 — Run records: sealed directories, in-run look-ahead checks, status, append-only registry
+
+2026-11-27 · provisional · agent
+
+**Context.** Ticket #9. Every number must be reproducible and attributable (plan 05 §6), the too-good alarm was left to this ticket (D-030), and every run counts as a trial (D-013).
+
+**Decision.**
+- **Sealing.** A run is written under `.incomplete-<run_id>`, hashed (SHA-256 per file) into `manifest.json`, made read-only and renamed into place. A run directory that exists is finished. `runs.verify` detects any change. Mode bits do not stop root, so the manifest is the real guarantee.
+- **Provenance.** Git SHA and dirty flag (untracked files count; no git means dirty), Python/nordpower/polars/tzdata versions, data snapshot id = latest `ingested_at` across curated datasets at start, vault opening, start and finish times.
+- **In-run look-ahead checks.** (1) `decision_times`: every forecast's decision time is its day's cutoff and before gate closure, and every forecast MTU lies in that delivery day. (2) `future_poison`: for 3 sampled delivery days (first, last, evenly between), the walk-forward is replayed from a deep copy of the model's state before the run, on a store whose vintages not yet knowable at that day's cutoff are garbage. That day's forecasts must be bit-identical. This catches a model or engine that reads around the knowledge view. The CI suite (`tests/leakage/`) proves the machinery; these checks prove a given run.
+- **Status.** `invalid` (a check failed) > `suspect` (rMAE vs naive below 0.5 in any zone total or era, `configs/run_status.toml`) > `exploratory` (dirty or unknown tree) > `ok`. The status file lists every reason, not only the winning one.
+- **Registry.** `data/runs/registry.jsonl`, append-only. `started` is written after the vault check and before any work, then `finished` (with status) or `failed` (with the error). Missing second line = `abandoned`. Trials per family count every started run. A refused vault request is not a trial: nothing ran. `--family` defaults to `S1`.
+
+**Why.**
+- Rename-after-seal makes a half-written run impossible to mistake for a finished one.
+- Registering before the work means a crash still counts as a trial, which is the point of trial counting.
+- A side-channel cheat (an oracle handed the answers outside the store) cannot be seen by any view-level check; only the too-good alarm catches it. Both are needed and the tests plant one of each.
+
+**Alternatives rejected.**
+- A status that is only the most severe label: hides that a run was also dirty or also too good.
+- Poison-checking every day: doubles to squares the cost of a run for little extra power; the CI suite covers every day on synthetic history.
+- A registry rebuilt from run directories: failed runs leave no directory and would vanish.
+
+**Cost / follow-up.**
+- The poison replay of the last sampled day repeats the whole walk-forward, so a run costs up to about 3× its decide phase. Revisit when models get slow (fewer samples, or a cached replay).
+- Models must be deep-copyable.
+- The too-good alarm has no Sharpe ceiling yet: no strategy produces P&L.
+
+**Revisit if** a slow model makes the replay cost matter, or a run needs to be re-scored (that is a new run, never an edit).

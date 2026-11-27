@@ -76,15 +76,20 @@ Rules: orders are timestamped; a fill can never use a price with knowledge time 
 
 ## 6. Run record (what a run writes)
 
-Immutable directory `data/runs/<run_id>/`:
+Immutable directory `data/runs/<run_id>/`, sealed as one step (D-037): written under `.incomplete-<run_id>`, hashed into `manifest.json`, made read-only, then renamed into place. `runs.verify(dir)` reports any changed, missing or extra file.
 
-- `config.yaml` (full resolved config, incl. feature list, cadence, cost profile, exclusions, pre-registered hypothesis)
-- `provenance.json` (git SHA + dirty flag, package versions, data snapshot id, share of features with `assumed` knowledge time, vault token use, wall-clock)
-- `forecasts.parquet`, `orders.parquet`, `fills.parquet`, `pnl.parquet`
-- `metrics.json`, `leakage_checks.json`
-- `status`: `ok | suspect | invalid` (suspect = tripped the too-good alarm; invalid = a leakage check failed)
+Built (Phase 0, #9):
 
-A dirty git tree marks the run `exploratory`; exploratory runs still count as trials but cannot be promoted.
+- `config.json` (model, rule, zones, delivery days, family, cutoff, scoring instant, vault opening)
+- `provenance.json` (git SHA + dirty flag, package versions, data snapshot id = latest `ingested_at` in the store at start, vault token use, start and finish times)
+- `forecasts.parquet`, `metrics.json`
+- `leakage_checks.json`: `decision_times` (every forecast made at its day's cutoff, before gate closure, for that day only) and `future_poison` (the walk-forward replayed up to sampled days on a store whose not-yet-knowable vintages are garbage; forecasts must be bit-identical)
+- `status.json`: `invalid | suspect | exploratory | ok` with reasons and the rules applied (`configs/run_status.toml`). Most severe wins: invalid = a look-ahead check failed; suspect = rMAE vs naive below 0.5 in any zone or era; exploratory = dirty or unknown git tree. Only `ok` runs can be promoted; every run counts as a trial.
+- `manifest.json`
+
+Later: full resolved config incl. feature list, cadence, cost profile, exclusions and pre-registered hypothesis; share of features with `assumed` knowledge time; `orders.parquet`, `fills.parquet`, `pnl.parquet`; Sharpe ceiling in the too-good alarm.
+
+**Registry.** `data/runs/registry.jsonl` is append-only: a `started` line before any work, then `finished` (with status) or `failed` (with the error). A run with no second line is `abandoned`. `nordpower runs` lists every run and the trial count per strategy family.
 
 ## 7. Reporting honesty rules
 

@@ -9,6 +9,7 @@ from nordpower.backtest import run_backtest
 from nordpower.curate import curate_prices
 from nordpower.ingest.energidataservice import PRICE_DATASETS, fetch_prices
 from nordpower.models.naive import Naive
+from nordpower.runs import registry, trial_counts
 from nordpower.store import Store
 from nordpower.timeutil import delivery_span
 from nordpower.zones import load_zones
@@ -40,6 +41,9 @@ def main(argv: list[str] | None = None) -> None:
     bt.add_argument("--start", type=date.fromisoformat, required=True, help="first delivery day")
     bt.add_argument("--end", type=date.fromisoformat, required=True, help="last delivery day")
     bt.add_argument("--zones", type=_zones, default=["DK1", "DK2"])
+    bt.add_argument("--family", default="S1", help="strategy family the run is a trial of")
+
+    sub.add_parser("runs", help="list every run in the registry, with trials per family")
 
     a = p.parse_args(argv)
     raw = a.data_dir / "raw"
@@ -57,9 +61,19 @@ def main(argv: list[str] | None = None) -> None:
             failed = f"{result['failed']} failed" + (f" ({checks})" if checks else "")
             print(f"{zone}: {result['zone_days']} zone-days checked, {failed}")
     elif a.cmd == "backtest":
-        run_dir = run_backtest(store, Naive(a.zones), a.zones, a.start, a.end, a.data_dir / "runs")
+        run_dir = run_backtest(
+            store, Naive(a.zones), a.zones, a.start, a.end, a.data_dir / "runs", family=a.family
+        )
+        status = json.loads((run_dir / "status.json").read_text())
         print(run_dir)
+        print(f"status: {status['status']}" + "".join(f"\n  {r}" for r in status["reasons"]))
         print(json.dumps(json.loads((run_dir / "metrics.json").read_text()), indent=2))
+    elif a.cmd == "runs":
+        listed = registry(a.data_dir / "runs")
+        for r in listed:
+            print(f"{r['run_id']}  {r['family']}  {r['model']}  {r['state']}")
+        for family, n in sorted(trial_counts(listed).items()):
+            print(f"{family}: {n} trials")
 
 
 if __name__ == "__main__":

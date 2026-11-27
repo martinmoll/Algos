@@ -62,7 +62,7 @@ def test_curated_prices_are_hourly_before_the_switch_and_15_minute_from_it(data_
 
 
 def test_backtest_across_the_switch_scores_each_era_separately(data_dir):
-    (run,) = (data_dir / "runs").iterdir()
+    (run,) = [p for p in (data_dir / "runs").iterdir() if p.is_dir()]
     metrics = json.loads((run / "metrics.json").read_text(encoding="utf-8"))
     for zone in ["DK1", "DK2"]:
         seg = metrics[zone]["eras"]
