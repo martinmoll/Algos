@@ -398,7 +398,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-037 — Run records: sealed directories, in-run look-ahead checks, status, append-only registry
 
-2026-11-27 · provisional · agent
+2026-11-27 · accepted (user confirmed 2026-11-27) · agent
 
 **Context.** Ticket #9. Every number must be reproducible and attributable (plan 05 §6), the too-good alarm was left to this ticket (D-030), and every run counts as a trial (D-013).
 

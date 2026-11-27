@@ -72,6 +72,7 @@ def test_a_sealed_run_is_read_only_and_verifies(store, tmp_path, clean):
         "forecasts.parquet",
         "metrics.json",
         "leakage_checks.json",
+        "quality.json",
         "status.json",
         "manifest.json",
     } == names
@@ -156,3 +157,26 @@ def test_cli_lists_a_hand_written_registry_entry_without_a_model(tmp_path, capsy
     runs.register(tmp_path / "runs", {"event": "started", "run_id": "x", "at": "t", "family": "S1"})
     cli.main(["--data-dir", str(tmp_path), "runs"])
     assert "x  S1  ?  abandoned" in capsys.readouterr().out
+
+
+def test_the_quality_summary_covers_the_run_and_its_lookback(store, tmp_path, clean):
+    q = load(run(store, tmp_path), "quality.json")
+    assert q["first_delivery_day"] == (FIRST - timedelta(days=7)).isoformat()
+    assert q["last_delivery_day"] == LAST.isoformat()
+    dk1 = q["view"]["DK1"]
+    assert dk1["zone_days"] == 14
+    # the fixture holds every hour of every day, so nothing fails
+    assert dk1["failed"] == 0 and q["view"]["failures"] == []
+
+
+def test_the_quality_summary_reports_a_missing_day(tmp_path, clean):
+    start, end = delivery_span(FIRST - timedelta(days=7), LAST)
+    hours = [start + timedelta(hours=i) for i in range((end - start) // timedelta(hours=1))]
+    gap = delivery_span(FIRST + timedelta(days=2), FIRST + timedelta(days=2))
+    prices = {("DK1", t): 50.0 for t in hours if not gap[0] <= t < gap[1]}
+    s = Store(tmp_path / "store")
+    s.append("da_price", price_rows(prices, datetime(2024, 4, 1, tzinfo=UTC)))
+    q = load(run(s, tmp_path), "quality.json")
+    assert q["view"]["DK1"]["failed"] == 1
+    assert q["view"]["DK1"]["by_check"] == {"completeness": 1}
+    assert q["view"]["failures"][0]["delivery_day"] == (FIRST + timedelta(days=2)).isoformat()
