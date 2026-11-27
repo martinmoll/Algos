@@ -32,7 +32,7 @@ The full contract is [docs/plan/03-no-lookahead.md](docs/plan/03-no-lookahead.md
 
 ### Issue tracker
 
-GitHub Issues on the private repo `martinmoll/EnergyTrading`, via `gh`. See `docs/agents/issue-tracker.md`.
+GitHub Issues on `martinmoll/Algos` (D-042), via the GitHub tools or `gh`. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
