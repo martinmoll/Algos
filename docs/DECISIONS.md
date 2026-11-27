@@ -349,7 +349,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-034 — Data quality and feature engineering before model complexity
 
-2026-11-24 · provisional · agent (on the user's direction, 2026-11-24)
+2026-11-24 · accepted (user confirmed 2026-11-27) · agent (on the user's direction, 2026-11-24)
 
 **Context.** The user asked that data quality stay at the forefront, and that good features rather than complicated models be the main route to results. Plan 04 already ranks models as a ladder; it did not say where effort goes between rungs.
 
@@ -367,7 +367,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-035 — Replicate TSO methods and model their residuals
 
-2026-11-24 · provisional · agent (on the user's direction, 2026-11-24)
+2026-11-24 · accepted (user confirmed 2026-11-27) · agent (on the user's direction, 2026-11-24)
 
 **Context.** TSOs and their bodies (eSett, JAO) publish the formulas behind imbalance prices, flow-based capacities and their forecasts. The user wants these used to understand the market and to find where they are weak.
 
@@ -381,7 +381,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-036 — Weather and satellite data: NWP for day-ahead, satellite for nowcasting, labels and snow
 
-2026-11-24 · provisional · agent (on the user's direction, 2026-11-24)
+2026-11-24 · accepted (user confirmed 2026-11-27) · agent (on the user's direction, 2026-11-24)
 
 **Context.** The user asked how satellite data can improve wind and solar prediction, and how this works at day-ahead granularity.
 
