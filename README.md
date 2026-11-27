@@ -23,7 +23,7 @@ uv run nordpower backtest --start 2025-09-08 --end 2025-09-21              # sea
 uv run nordpower runs                                                      # registry: every run, trials per family
 ```
 
-Dates are delivery days. Data lives in `data/` (git-ignored). Energi Data Service rate-limits `Elspotprices` to about one request per 5 minutes; ingest waits automatically. `backfill` asks for one calendar year per request, waits between requests and, if interrupted, picks up with the years it does not have yet.
+Dates are delivery days. Data lives in `data/` (git-ignored). Energi Data Service rate-limits `Elspotprices` to about one request per 5 minutes; ingest waits automatically. `backfill` asks for one calendar year per request, waits between requests and, if interrupted, picks up with the years it does not have yet. It never re-downloads a year it holds; use `ingest` to re-check a range for revisions.
 
 ## Learning track
 

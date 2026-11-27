@@ -442,7 +442,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-039 — Phase 0 exit: naive DK1/DK2 backtest over 2015-01-08 → 2025-11-15 (run 20261127T131921-naive-245114)
 
-2026-11-27 · accepted (exit criterion of spec #1) · agent
+2026-11-27 · provisional · agent
 
 **Context.** Ticket #10: prove Phase 0 on real history with a resumable backfill, then the naive walk-forward over the whole pre-vault range.
 

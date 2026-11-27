@@ -101,7 +101,11 @@ def backfill_prices(
 ) -> list[Path]:
     """Download delivery days first..last chunk by chunk, skipping chunks a raw snapshot
     already holds, pausing between requests to one dataset. Interrupt it at any point and
-    run it again: it carries on with the chunks it has not stored."""
+    run it again: it carries on with the chunks it has not stored.
+
+    A held chunk is never downloaded again, so a backfill does not pick up revisions. To
+    re-check a range against the source, run `ingest` for it: an unchanged download writes
+    nothing and a changed one becomes a new snapshot."""
     paths, last_request = [], {}
     for dataset, a, b in backfill_chunks(first, last):
         url = price_url(dataset, *delivery_span(a, b), zones)
