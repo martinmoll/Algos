@@ -1,6 +1,6 @@
 # Nordic power trading — agent rules
 
-Algorithmic and ML trading research for the Nordic power markets (NO, SE, DK, FI). Status: Phase 0 in progress (tickets #2–#10, parent #1). Start at [docs/plan/08-roadmap.md](docs/plan/08-roadmap.md). Run `uv run python check.py` before every commit.
+Algorithmic and ML trading research for the Nordic power markets (NO, SE, DK, FI). Status: Phase 0 complete (exit run 20261127T131921-naive-245114, D-039); Phase 1 next. Start at [docs/plan/08-roadmap.md](docs/plan/08-roadmap.md). Run `uv run python check.py` before every commit.
 
 ## Non-negotiable: no look-ahead
 
