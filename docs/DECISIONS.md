@@ -398,7 +398,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-037 — Run records: sealed directories, in-run look-ahead checks, status, append-only registry
 
-2026-11-27 · provisional · agent
+2026-11-27 · accepted (user confirmed 2026-11-27) · agent
 
 **Context.** Ticket #9. Every number must be reproducible and attributable (plan 05 §6), the too-good alarm was left to this ticket (D-030), and every run counts as a trial (D-013).
 
@@ -439,3 +439,30 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 **Cost.** No second pair of eyes before merge. Provisional decisions are still logged for the user to confirm afterwards, and every review comment stays on the PR.
 
 **Revisit if** a merged change has to be reverted because of something a human review would have caught.
+
+## D-039 — Phase 0 exit: naive DK1/DK2 backtest over 2015-01-08 → 2025-11-15 (run 20261127T131921-naive-245114)
+
+2026-11-27 · provisional · agent
+
+**Context.** Ticket #10: prove Phase 0 on real history with a resumable backfill, then the naive walk-forward over the whole pre-vault range.
+
+**What ran.**
+- `nordpower backfill --start 2015-01-01 --end 2025-11-15 --zones DK1,DK2`: 11 yearly `Elspotprices` chunks (2015 → 2025-09-30) and one `DayAheadPrices` chunk (2025-10-01 → 2025-11-15), downloaded 2026-11-27 12:28–13:19 UTC, 5 minutes apart. A second run fetched nothing ("have" for all 12 chunks).
+- `nordpower curate`: 179,766 `da_price` vintages; quality checks 3,972 zone-days per zone, 0 failed. A second curate stored 0 rows.
+- Exit run **20261127T131921-naive-245114**, commit 0b45f9a, clean tree, data snapshot 2026-11-27T13:18:50.885407Z, 3 min 41 s wall clock.
+
+**Result (run 20261127T131921-naive-245114).**
+- Status `ok`, no reasons. `decision_times` passed. `future_poison` passed on 2015-01-08, 2020-06-12 and 2025-11-15.
+- rMAE 1.00 for DK1 and DK2, in total and in both eras. n = n_expected = 98,475 MTUs per zone: 94,055 hourly and 4,420 quarter-hourly. The counts include every DST day: 2025-10-26 has 100 quarter-hours.
+- Naive MAE / RMSE (EUR/MWh): DK1 22.13 / 41.92, DK2 23.39 / 45.61. These are the denominators every later DK model is measured against on this range.
+- `quality.json`: 0 failed zone-days on the scoring view and in the curation records, over 2015-01-01 → 2025-11-15.
+- `check.py` (lint, types, import contract, leakage suite, other tests) passed at the run's commit.
+
+**Surprises and notes.**
+- **No system price.** `Elspotprices` has no `SYS` rows in this range; the series ends 2010-12-31 (D-026, re-checked against the API on 2026-11-27). The exit run covers DK1 and DK2. SYS stays an open data gap for S4.
+- **Clean source.** Not one completeness, duplicate or range failure in eleven years of DK prices, DST days included. Good news, but it also means the quality checks have only ever failed on crafted test data. The first source with real gaps (ENTSO-E) is their first real test.
+- **Network.** This session's default environment blocked `api.energidataservice.dk`. A personal environment "Algos" allowing only that host was created for this repository.
+- **Timing.** About 19 s per year of backtest. The future-poison replay roughly doubles the decide phase, as D-037 expected; no action needed yet.
+- One early timing run on 2015 only (20261127T122901-naive-c1f3c3, status `ok`, rMAE 1.00) is also in the registry. S1 now has 2 trials.
+
+**Revisit if** a re-download of this range ever differs: curate stores it as a new vintage, and the difference measures how far the assumed-vintage history could be off.

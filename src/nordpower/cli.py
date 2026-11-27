@@ -7,7 +7,7 @@ from pathlib import Path
 
 from nordpower.backtest import run_backtest
 from nordpower.curate import curate_prices
-from nordpower.ingest.energidataservice import PRICE_DATASETS, fetch_prices
+from nordpower.ingest.energidataservice import PRICE_DATASETS, backfill_prices, fetch_prices
 from nordpower.models.naive import Naive
 from nordpower.runs import registry, trial_counts
 from nordpower.store import Store
@@ -34,6 +34,11 @@ def main(argv: list[str] | None = None) -> None:
     ing.add_argument("--end", type=date.fromisoformat, required=True, help="last delivery day")
     ing.add_argument("--zones", type=_zones, default=["DK1", "DK2"])
 
+    bf = sub.add_parser("backfill", help="resumable chunked download of a long range")
+    bf.add_argument("--start", type=date.fromisoformat, required=True, help="first delivery day")
+    bf.add_argument("--end", type=date.fromisoformat, required=True, help="last delivery day")
+    bf.add_argument("--zones", type=_zones, default=["DK1", "DK2"])
+
     sub.add_parser("curate", help="raw snapshots -> curated store")
 
     bt = sub.add_parser("backtest", help="walk-forward backtest")
@@ -52,6 +57,8 @@ def main(argv: list[str] | None = None) -> None:
     if a.cmd == "ingest":
         dataset = next(d for d in PRICE_DATASETS if d.lower() == a.dataset)
         print(fetch_prices(dataset, raw, *delivery_span(a.start, a.end), a.zones))
+    elif a.cmd == "backfill":
+        backfill_prices(raw, a.start, a.end, a.zones)
     elif a.cmd == "curate":
         stored, quality = curate_prices(raw, store)
         print(f"curated {stored} da_price rows")

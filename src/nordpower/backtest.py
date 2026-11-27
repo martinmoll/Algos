@@ -2,6 +2,7 @@
 Score phase: runs after every forecast is frozen; only this phase reads realised prices."""
 
 import copy
+import itertools
 import json
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
@@ -12,6 +13,7 @@ import polars as pl
 
 from nordpower import runs
 from nordpower.models.naive import Naive
+from nordpower.quality import check_da_price
 from nordpower.store import KEY, META, KnowledgeView, Store, VaultSealed, VaultToken
 from nordpower.timeutil import (
     da_gate_closure,
@@ -190,6 +192,56 @@ def _data_snapshot_id(store: Store) -> str | None:
     return max(latest).isoformat() if latest else None
 
 
+LOOKBACK = timedelta(days=7)  # the naive model's longest reference (D-7)
+
+
+def _quality_summary(
+    store: Store, scored_at: datetime, zones: list[str], days: list[date], vault: VaultToken | None
+) -> dict:
+    """Data quality over every delivery day the run read (its days plus the naive lookback).
+
+    `view`: the checks (D-033) re-run on the latest vintages as of the scoring instant, i.e.
+    on exactly the data the run used. `snapshots`: failures recorded at curation, from quality
+    records ingested by then (L17), which also shows problems later downloads fixed."""
+    first, last = days[0] - LOOKBACK, days[-1]
+    span = [first + timedelta(days=i) for i in range((last - first).days + 1)]
+    start, end = delivery_span(first, last)
+    rows = store.as_of(scored_at, vault=vault).read(
+        "da_price", zones=zones, event_start=start, event_end=end
+    )
+    failures = check_da_price(rows, frozenset((z, d) for z in zones for d in span))
+
+    def counts(fs: list[dict]) -> dict:
+        out = {z: {"zone_days": len(span), "failed": 0, "by_check": {}} for z in zones}
+        for zone, group in itertools.groupby(
+            sorted(fs, key=lambda f: f["zone"]), lambda f: f["zone"]
+        ):
+            group = list(group)
+            out[zone]["failed"] = len({f["delivery_day"] for f in group})
+            for f in group:
+                by = out[zone]["by_check"]
+                by[f["check"]] = by.get(f["check"], 0) + 1
+        return out
+
+    recorded = []
+    for p in sorted((store.root / "quality" / "da_price").glob("*.json")):
+        rec = json.loads(p.read_text(encoding="utf-8"))
+        if datetime.fromisoformat(rec["ingested_at"]) > scored_at:
+            continue
+        recorded += [
+            f
+            for f in rec["failures"]
+            if f["zone"] in zones and first.isoformat() <= f["delivery_day"] <= last.isoformat()
+        ]
+    return {
+        "first_delivery_day": first.isoformat(),
+        "last_delivery_day": last.isoformat(),
+        "view": counts(failures)
+        | {"failures": [f | {"delivery_day": f["delivery_day"].isoformat()} for f in failures]},
+        "snapshots": counts(recorded),
+    }
+
+
 def _write_json(path: Path, obj: dict | list) -> None:
     path.write_text(json.dumps(obj, indent=2, default=str), encoding="utf-8")
 
@@ -278,6 +330,7 @@ def _run(
     forecasts = _decide(store, model, days, vault)
     bench = _decide(store, Naive(zones), days, vault)  # always recomputed, never reused
     metrics = _score(store, scored_at, forecasts, bench, zones, days, vault)
+    quality = _quality_summary(store, scored_at, zones, days, vault)
     checks = [
         _check_decision_times(forecasts),
         _check_future_poison(
@@ -315,5 +368,6 @@ def _run(
     forecasts.write_parquet(tmp / "forecasts.parquet")
     _write_json(tmp / "metrics.json", metrics)
     _write_json(tmp / "leakage_checks.json", checks)
+    _write_json(tmp / "quality.json", quality)
     _write_json(tmp / "status.json", status | {"rules": rules})
     return runs.seal(tmp, runs_root / run_id), status
