@@ -17,12 +17,13 @@ uv run python check.py       # lint, format check, type check, tests
 
 ```sh
 uv run nordpower ingest elspotprices --start 2025-09-01 --end 2025-09-21   # raw snapshot
+uv run nordpower backfill --start 2015-01-01 --end 2025-11-15             # years of raw data, resumable
 uv run nordpower curate                                                    # -> as-of store
 uv run nordpower backtest --start 2025-09-08 --end 2025-09-21              # sealed run record in data/runs/
 uv run nordpower runs                                                      # registry: every run, trials per family
 ```
 
-Dates are delivery days. Data lives in `data/` (git-ignored). Energi Data Service rate-limits `Elspotprices` to about one request per 5 minutes; ingest waits automatically.
+Dates are delivery days. Data lives in `data/` (git-ignored). Energi Data Service rate-limits `Elspotprices` to about one request per 5 minutes; ingest waits automatically. `backfill` asks for one calendar year per request, waits between requests and, if interrupted, picks up with the years it does not have yet.
 
 ## Learning track
 
