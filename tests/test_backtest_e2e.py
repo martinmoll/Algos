@@ -26,7 +26,7 @@ def run_dir(tmp_path, monkeypatch) -> Path:
     cli.main([*data, "ingest", "elspotprices", "--start", "2024-01-01", "--end", "2024-01-21"])
     cli.main([*data, "curate"])
     cli.main([*data, "backtest", "--start", "2024-01-08", "--end", "2024-01-21"])
-    (run,) = (tmp_path / "runs").iterdir()
+    (run,) = [p for p in (tmp_path / "runs").iterdir() if p.is_dir()]
     return run
 
 

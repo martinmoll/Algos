@@ -143,6 +143,14 @@ The dated list of market-design changes that models and evaluations must treat a
 One recorded execution of a backtest or evaluation, immutable and identified by a run id.
 _Avoid_: Experiment (that is a pre-registered question that may have many runs), job
 
+**Run status**:
+The verdict written into every sealed run: *invalid* (a look-ahead check failed), *suspect* (too good: rMAE below the floor), *exploratory* (dirty or unknown git tree), or *ok*. The most severe that applies wins; only *ok* runs can be promoted.
+_Avoid_: Result, outcome
+
+**Run registry**:
+The append-only log of every run that started, with its outcome (a status, *failed* or *abandoned*); the source of trial counts per strategy family.
+_Avoid_: Run list, history
+
 **Trial**:
 A run counted toward multiple-testing statistics for its strategy family; every run is a trial.
 

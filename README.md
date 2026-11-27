@@ -18,7 +18,8 @@ uv run python check.py       # lint, format check, type check, tests
 ```sh
 uv run nordpower ingest elspotprices --start 2025-09-01 --end 2025-09-21   # raw snapshot
 uv run nordpower curate                                                    # -> as-of store
-uv run nordpower backtest --start 2025-09-08 --end 2025-09-21              # run record in data/runs/
+uv run nordpower backtest --start 2025-09-08 --end 2025-09-21              # sealed run record in data/runs/
+uv run nordpower runs                                                      # registry: every run, trials per family
 ```
 
 Dates are delivery days. Data lives in `data/` (git-ignored). Energi Data Service rate-limits `Elspotprices` to about one request per 5 minutes; ingest waits automatically.

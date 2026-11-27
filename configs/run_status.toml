@@ -1,0 +1,14 @@
+# Run status rules (plan 03 §5.5, plan 05 §6, D-037).
+#
+# A run is `suspect` when any zone's rMAE vs naive, in total or in any era, is below the
+# floor: in day-ahead price forecasting that is far better than published state of the art,
+# so it is treated as a bug report until a written review says otherwise. Changing the floor
+# needs a decision-log entry.
+
+[suspect]
+rmae_floor = 0.5
+reviewed = "2026-11-27, D-037"
+
+[future_poison]
+# Delivery days re-decided on a poisoned store per run: first, last, and evenly spaced between.
+sample_days = 3
