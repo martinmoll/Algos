@@ -125,3 +125,24 @@ def test_quality_checks_run_per_series_of_any_dataset():
     assert ("duplicate", "DK1-DK2", "in") in [
         (f["check"], f["border"], f["direction"]) for f in check(SYNTHETIC, dup)
     ]
+
+
+def test_every_registered_publication_rule_exists():
+    from nordpower.publication import load_rules
+
+    rules = load_rules()
+    for spec in load_registry().values():
+        assert spec.publication_rule is None or spec.publication_rule in rules, spec.name
+
+
+def test_the_range_check_works_on_integer_columns():
+    spec = parse_registry(
+        '[n]\nkey=["event_time"]\nmtu="none"\nquality=["range"]\n[n.columns]\n'
+        'event_time="Datetime"\ncount="Int64"'
+    )["n"]
+    data = pl.DataFrame(
+        {"event_time": [EVENT, EVENT + timedelta(hours=1)], "count": [5, 500]},
+        schema={"event_time": spec.columns["event_time"], "count": pl.Int64},
+    )
+    [found] = check(spec, data, bounds={"n": {"range": {"count": {"min": 0, "max": 100}}}})
+    assert found["check"] == "range" and "1 count outside" in found["detail"]
