@@ -515,3 +515,31 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 **Context.** D-025 and CLAUDE.md named the private repo `martinmoll/EnergyTrading`, but the code, every ticket (#1–#10) and every PR live in `martinmoll/Algos`.
 **Decision.** `martinmoll/Algos` is the repository and the issue tracker. CLAUDE.md and the architecture layout now say so. The project keeps its display name "EnergyTrading" in the README title.
+
+## D-043 — Dataset registry: one TOML entry per curated table, enforced on every append
+
+2026-11-27 · provisional · agent
+
+**Context.** Ticket #19. The store's key was fixed to `zone, event_time` and curate and the quality checks knew only `da_price`. Phase 1 adds datasets keyed by border and direction, CNEC, forecast product, weather point and model, and outage message.
+
+**Decision.**
+- `configs/datasets.toml` declares, per dataset:
+  - `key` (must include `event_time`)
+  - `columns` with dtypes (String, Float64, Int64, Boolean, Date, or Datetime as µs UTC)
+  - `mtu` (`da_era`, an ISO duration such as `PT60M`, or `none`)
+  - `quality` (any of completeness, duplicate, range)
+  - `publication_rule`
+- The five meta columns are added by the store and may not be declared. `nordpower.datasets` is a leaf module that parses the file and refuses malformed entries.
+- `Store.append` validates the rows against the registry before anything is written: exact column set and exact dtypes. Version resolution (D-029) uses the dataset's key.
+- `KnowledgeView.read(dataset, *, event_start, event_end, zones=None, **where)` filters any key column to listed values. `zones=` is the `zone` column, so every Phase 0 call is unchanged. Filtering on a non-key column is an error. An empty dataset reads as an empty frame with its schema.
+- Quality checks are looked up per dataset and run per series (the key without `event_time`). Range bounds move to `[<dataset>.range.<column>]` in `configs/quality.toml`. **The values are unchanged** (−500/+4000 EUR/MWh, D-033); only the layout moved. Failure records keep their Phase 0 shape for `da_price` (a `zone` field).
+- `Store(root, registry=...)` accepts a registry, so tests can add datasets without touching the real config.
+- The look-ahead suite gains `tests/leakage/test_registry_lookahead.py`. It runs time-travel equivalence, future poison at the view and the canary over **every registered dataset**, plus a synthetic dataset keyed by `border, direction, event_time`. Mutation-tested: an off-by-a-microsecond knowledge filter and a wrong group key each fail it.
+
+**Why.** One declaration per dataset is what the leakage tests can enumerate. A strict schema on append catches a source changing its fields before bad rows become vintages.
+
+**Alternatives rejected.**
+- One Python class per dataset: more code, and nothing a TOML entry cannot say yet.
+- A loose append that accepts any columns: a renamed field would silently start a new column.
+
+**Revisit if** a dataset needs a check the three generic ones cannot express. Add it to `quality.CHECKS` with a test rather than special-casing it in curate.

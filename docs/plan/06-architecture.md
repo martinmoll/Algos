@@ -92,7 +92,7 @@ Design intent: a deep module. Small interface, all the bitemporal complexity (ve
 
 ## 5. Store schema (curated tables)
 
-Common columns: `zone` (or other key), `event_time` (UTC), `resolution` (`PT15M|PT60M|P1D|P1W`), `value` columns, `knowledge_time` (UTC), `knowledge_time_grade`, `source`, `ingested_at`, `raw_ref` (pointer to the raw snapshot row for audit).
+Every dataset is declared in `configs/datasets.toml` (key, columns and dtypes, MTU grid, quality checks, publication rule; D-043), and `Store.append` refuses rows that do not match. Common columns: `zone` (or other key), `event_time` (UTC), `resolution` (`PT15M|PT60M|P1D|P1W`), `value` columns, `knowledge_time` (UTC), `knowledge_time_grade`, `source`, `ingested_at`, `raw_ref` (pointer to the raw snapshot row for audit).
 
 Native resolution is stored as published; resampling (e.g. 15-min → hourly mean) happens in features with explicit rules, never in storage.
 

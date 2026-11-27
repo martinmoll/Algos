@@ -1,0 +1,24 @@
+# Dataset registry (D-043): what each curated table holds. One section per dataset.
+#
+# key      columns that identify one value; must include event_time. A new value for the
+#          same key is a new vintage (D-029), never a new row.
+# columns  every non-meta column with its dtype: String, Float64, Int64, Boolean, Date or
+#          Datetime (microseconds, UTC). Meta columns (knowledge_time, knowledge_time_grade,
+#          source, ingested_at, raw_ref) are added to every dataset.
+# mtu      the event-time grid one delivery day holds: "da_era" (day-ahead MTU of that day,
+#          from the time module), an ISO duration such as "PT60M", or "none" (no fixed grid).
+# quality  checks run on every raw snapshot before it is stored (D-033): completeness,
+#          duplicate, range. Range bounds live in configs/quality.toml.
+# publication_rule  the configs/publication_rules.toml entry that dates backfilled rows.
+
+[da_price]
+key = ["zone", "event_time"]
+mtu = "da_era"
+quality = ["completeness", "duplicate", "range"]
+publication_rule = "da_price"
+
+[da_price.columns]
+zone = "String"
+event_time = "Datetime"
+resolution = "String"
+price_eur_mwh = "Float64"
