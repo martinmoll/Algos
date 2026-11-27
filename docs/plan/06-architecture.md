@@ -22,7 +22,7 @@ One Python package, one storage directory, one CLI. Boring on purpose: the sophi
 ## 2. Layout
 
 ```
-EnergyTrading/
+Algos/
 ├── CLAUDE.md                  # agent rules (no-look-ahead invariants first)
 ├── GLOSSARY.md                # domain language
 ├── README.md

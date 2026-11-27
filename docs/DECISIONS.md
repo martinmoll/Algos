@@ -508,3 +508,10 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 **Why.** A real-money path added work (Phase 6, regulatory review, membership questions) that this project will never use, and wording that made the paper loop sound like a sales tool.
 
 **Revisit if** the user ever changes this, which would need a new decision: the removed Phase 6 work and the licence review come back first.
+
+## D-042 — The repository and issue tracker is martinmoll/Algos
+
+2026-11-27 · accepted · user
+
+**Context.** D-025 and CLAUDE.md named the private repo `martinmoll/EnergyTrading`, but the code, every ticket (#1–#10) and every PR live in `martinmoll/Algos`.
+**Decision.** `martinmoll/Algos` is the repository and the issue tracker. CLAUDE.md and the architecture layout now say so. The project keeps its display name "EnergyTrading" in the README title.
