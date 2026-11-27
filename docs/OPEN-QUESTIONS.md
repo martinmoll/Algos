@@ -8,11 +8,15 @@ Decisions only you can make. Each has a recommended answer that the plan current
 
 ➡️ Assume (d): build the tamper-evident paper-trading record first and decide on real access when Phase 5 has verdicts. (D-003)
 
+**Status 2026-11-27:** closed. The user accepted the default: (d) research and a paper-trading record first; real access is decided when Phase 5 has verdicts.
+
 ---
 
 ❓ **Q2 — Capital and risk scale.** What size are we designing for (order of magnitude in MW or EUR at risk)? It sets price-impact assumptions, whether fixed membership fees can ever be recovered, and position limits.
 
 ➡️ Assume small price-taker (≤ 1–5 MW per MTU, no market impact), revisited at Q1.
+
+**Status 2026-11-27:** closed. The user accepted the default: small price-taker, 1–5 MW per MTU, no market impact.
 
 ---
 
@@ -24,11 +28,15 @@ Decisions only you can make. Each has a recommended answer that the plan current
 
 **Status 2026-11-18:** ENTSO-E token received and stored in `.env` as `ENTSOE_API_TOKEN`; verified with an A44 DK1 query for 2024-01-15 (HTTP 200, prices identical to Energi Data Service). ENTSO-E done. Fingrid key and UMM registration still open.
 
+**Status 2026-11-27:** the user accepted the default. ENTSO-E is done; the Fingrid key and the Nord Pool UMM registration are still to do, and they are not needed for the first Phase 1 tickets. Cloud sessions get the ENTSO-E token through the environment's secure credential form, not from `.env`.
+
 ---
 
 ❓ **Q4 — Data budget.** Intraday prices (trades, order book, IDA) and futures/EPAD settlements are paid data (Nord Pool products roughly €1.7–4k+/year each; Euronext separately). Without them, strategies S3 (intraday) and S4 (futures) can only start from self-collected forward data.
 
 ➡️ €0 for now. Revisit when the day-ahead benchmark exists and we know whether S3/S4 are worth paying for.
+
+**Status 2026-11-27:** closed. The user accepted the default: €0 data budget for now, revisited once the day-ahead benchmark exists.
 
 ---
 
@@ -36,11 +44,15 @@ Decisions only you can make. Each has a recommended answer that the plan current
 
 ➡️ Personal research now; licences and regulatory review become a gate before any real-money trading. (D-017)
 
+**Status 2026-11-27:** closed. The user accepted the default: personal research; a licence and regulatory review gates any real-money trading.
+
 ---
 
 ❓ **Q6 — Always-on collector host.** Forecast vintages can only be captured live. Is there a machine that is always on (home server, NAS, Raspberry Pi), or should we use a small cloud VPS (~€5/month)?
 
 ➡️ Small VPS running collectors only, nightly sync to this PC. Until then collectors run here when the PC is on and gaps are recorded.
+
+**Status 2026-11-27:** closed. The user chose the default: a small cloud VPS (about €5/month) that runs only the collectors, with a nightly sync. Choosing and setting up the VPS is a Phase 1 ticket.
 
 ---
 
@@ -48,17 +60,23 @@ Decisions only you can make. Each has a recommended answer that the plan current
 
 ➡️ Keep 12 months. (D-014)
 
+**Status 2026-11-27:** closed. The user accepted the default: keep the 12-month vault.
+
 ---
 
 ❓ **Q8 — Your edge.** You said you would bring your own intuition. Which of these do you know best: hydrology/reservoir dynamics, wind/weather, grid and flow-based constraints, a specific zone, balancing operations, futures? That is where the structural-model track (M8) and feature work should start.
 
 ➡️ No assumption made; default priority is hydro balance + wind + nuclear availability for NO2/SE3/DK1.
 
+**Status 2026-11-27:** closed for now. The user accepted the default priority: hydro balance, wind and nuclear availability for NO2, SE3 and DK1. Revisit if the user names an area of expertise.
+
 ---
 
 ❓ **Q9 — Compute.** Is there a GPU on this PC or a cloud budget? Affects DNN/foundation-model cadence only; LEAR and LightGBM run fine on CPU.
 
 ➡️ Assume CPU-only; deep models retrain monthly.
+
+**Status 2026-11-27:** closed. The user accepted the default: CPU only; deep models retrain monthly.
 
 ---
 
@@ -68,11 +86,15 @@ Decisions only you can make. Each has a recommended answer that the plan current
 
 **Status 2026-11-17:** private repo `martinmoll/EnergyTrading` created (D-025). Agent commit policy still open.
 
+**Status 2026-11-27:** closed. Agents commit on feature branches and open, review and merge their own ticket PRs (D-038).
+
 ---
 
 ❓ **Q11 — Stack sign-off.** Python 3.12 + uv + Polars + DuckDB/Parquet + LightGBM/PyTorch + Streamlit, no orchestrator or MLflow initially. (D-010 – D-012)
 
 ➡️ Yes.
+
+**Status 2026-11-27:** closed. The user accepted the stack.
 
 ---
 
