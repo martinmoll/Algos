@@ -139,6 +139,13 @@ The dated list of market-design changes that models and evaluations must treat a
 
 ### Research protocol
 
+**Dataset registry**:
+The single declaration of every curated table: its key, columns and dtypes, MTU grid, quality checks and publication rule (`configs/datasets.toml`, D-043).
+_Avoid_: Schema file, catalogue (the catalogue in plan 02 is the wish list; the registry is what exists)
+
+**Series**:
+One sequence of values in a dataset: its key without event time, e.g. a zone for `da_price` or a border and direction for flows. Quality checks run per series and delivery day.
+
 **Run**:
 One recorded execution of a backtest or evaluation, immutable and identified by a run id.
 _Avoid_: Experiment (that is a pre-registered question that may have many runs), job

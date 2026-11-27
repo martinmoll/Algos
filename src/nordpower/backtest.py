@@ -14,7 +14,7 @@ import polars as pl
 from nordpower import runs
 from nordpower.models.naive import Naive
 from nordpower.quality import check_da_price
-from nordpower.store import KEY, META, KnowledgeView, Store, VaultSealed, VaultToken
+from nordpower.store import KnowledgeView, Store, VaultSealed, VaultToken
 from nordpower.timeutil import (
     da_gate_closure,
     da_mtus,
@@ -107,6 +107,7 @@ class _PoisonedStore(Store):
 
     def __init__(self, base: Store, t: datetime):
         self.root, self.vault_start, self._issued = base.root, base.vault_start, base._issued
+        self.registry = base.registry
         self._base, self._t = base, t
 
     def _parts(self, dataset: str) -> pl.LazyFrame | None:
@@ -127,8 +128,7 @@ class _PoisonedStore(Store):
 
         return stored.with_columns(
             pl.when(future).then(garbage(schema[c])).otherwise(pl.col(c)).alias(c)
-            for c in schema
-            if c not in KEY and c not in META
+            for c in self.dataset(dataset).values
         )
 
 

@@ -18,12 +18,13 @@ import pytest
 from nordpower import runs
 from nordpower.backtest import run_backtest
 from nordpower.models.naive import Naive
-from nordpower.store import KEY, KnowledgeView, Store
+from nordpower.store import KnowledgeView, Store
 from nordpower.timeutil import da_mtus
 
 from .conftest import ZONES, all_rows
 
 FIRST, LAST = date(2024, 3, 28), date(2024, 4, 6)
+KEY = ["zone", "event_time"]  # da_price's key (configs/datasets.toml)
 
 
 @pytest.fixture(autouse=True)

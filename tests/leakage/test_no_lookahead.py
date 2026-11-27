@@ -12,7 +12,7 @@ from hypothesis import strategies as st
 
 from nordpower.backtest import run_backtest
 from nordpower.models.naive import Naive
-from nordpower.store import KEY, Store
+from nordpower.store import Store
 from nordpower.timeutil import decision_cutoff, delivery_span, hours_of
 
 from .conftest import (
@@ -25,6 +25,7 @@ from .conftest import (
 )
 
 START, END = delivery_span(FIRST, LAST)
+KEY = ["zone", "event_time"]  # da_price's key (configs/datasets.toml)
 DECISION_DAYS = [date(2024, 3, 28) + timedelta(days=i) for i in range(10)]  # spans DST day
 # Every model must pass the engine-level tests. Add new models here.
 MODELS = [Naive]

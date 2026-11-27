@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlsplit
 
 import polars as pl
 
+from nordpower.datasets import load_registry
 from nordpower.ingest.energidataservice import PRICE_DATASETS, SOURCE
 from nordpower.publication import ASSUMED, assumed_knowledge_time, load_rules
 from nordpower.quality import check_da_price
@@ -69,17 +70,7 @@ def curate_prices(raw_root: Path, store: Store) -> tuple[int, dict[str, dict]]:
     return n, _summary(failed_checks)
 
 
-SCHEMA = {
-    "zone": pl.String,
-    "event_time": pl.Datetime("us", "UTC"),
-    "resolution": pl.String,
-    "price_eur_mwh": pl.Float64,
-    "knowledge_time": pl.Datetime("us", "UTC"),
-    "knowledge_time_grade": pl.String,
-    "source": pl.String,
-    "ingested_at": pl.Datetime("us", "UTC"),
-    "raw_ref": pl.String,
-}
+SCHEMA = load_registry()["da_price"].schema
 
 
 def _requested_zone_days(url: str) -> frozenset[tuple[str, date]]:

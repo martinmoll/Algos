@@ -1,8 +1,9 @@
 """Bitemporal, append-only store. The only read path is `Store.as_of(t)`.
 
 Each dataset is a directory of Parquet parts, written once and never changed. Every row
-is a vintage: a value for (zone, event_time) plus the time it became knowable. A view at
-instant t sees, per (zone, event_time), the latest vintage with knowledge_time <= t.
+is a vintage: a value for the dataset's key (from the registry, D-043; e.g. zone and
+event_time) plus the time it became knowable. A view at instant t sees, per key, the latest
+vintage with knowledge_time <= t.
 """
 
 import json
@@ -16,10 +17,9 @@ from uuid import uuid4
 
 import polars as pl
 
+from nordpower.datasets import Dataset, load_registry
 from nordpower.timeutil import local_instant
 
-KEY = ["zone", "event_time"]
-META = ["knowledge_time", "knowledge_time_grade", "source", "ingested_at", "raw_ref"]
 # ponytail: path assumes a source checkout, same as publication.py
 REPO = Path(__file__).resolve().parents[2]
 VAULT_CONFIG = REPO / "configs" / "vault.toml"
@@ -65,10 +65,19 @@ def load_vault_start(path: Path = VAULT_CONFIG) -> datetime:
 
 
 class Store:
-    def __init__(self, root: Path | str):
+    def __init__(self, root: Path | str, registry: dict[str, Dataset] | None = None):
         self.root = Path(root)
         self.vault_start = load_vault_start()
+        self.registry = load_registry() if registry is None else registry
         self._issued: set[VaultToken] = set()
+
+    def dataset(self, name: str) -> Dataset:
+        try:
+            return self.registry[name]
+        except KeyError:
+            raise KeyError(
+                f"{name!r} is not in the dataset registry (configs/datasets.toml)"
+            ) from None
 
     def open_vault(self, purpose: str) -> VaultToken:
         """Open the vault: append (time, purpose, caller) to the vault log, return a token.
@@ -103,19 +112,22 @@ class Store:
         graded `observed` when that moves it later. A row with no earlier vintage keeps the
         knowledge time it was given.
         """
-        rows = rows.unique(subset=KEY, keep="last", maintain_order=True).sort("ingested_at")
-        values = [c for c in rows.columns if c not in KEY and c not in META]
+        spec = self.dataset(dataset)
+        spec.validate(rows)
+        key, values = list(spec.key), list(spec.values)
+        rows = rows.select(*spec.schema)  # registry column order
+        rows = rows.unique(subset=key, keep="last", maintain_order=True).sort("ingested_at")
         stored = self._parts(dataset)
         if stored is not None:
             held = (
-                stored.select(*KEY, "ingested_at", *values)
+                stored.select(*key, "ingested_at", *values)
                 .collect()
                 .rename({c: f"{c}_prev" for c in values})
                 .with_columns(_seen=pl.lit(True))
                 .sort("ingested_at")
             )
             prev = rows.join_asof(
-                held, on="ingested_at", by=KEY, strategy="backward", check_sortedness=False
+                held, on="ingested_at", by=key, strategy="backward", check_sortedness=False
             )  # both sides sorted by ingested_at above
             changed = pl.any_horizontal([pl.col(c).ne_missing(pl.col(f"{c}_prev")) for c in values])
             seen = pl.col("_seen").is_not_null()
@@ -164,23 +176,36 @@ class KnowledgeView:
         self._sealed_from = sealed_from
 
     def read(
-        self, dataset: str, *, zones: list[str], event_start: datetime, event_end: datetime
+        self,
+        dataset: str,
+        *,
+        event_start: datetime,
+        event_end: datetime,
+        zones: list[str] | None = None,
+        **where: list,
     ) -> pl.DataFrame:
-        """Latest known vintage per (zone, event_time), event_start <= event_time < event_end."""
+        """Latest known vintage per key, event_start <= event_time < event_end.
+
+        `zones` and every keyword in `where` filter a key column to the listed values (`zones`
+        is the `zone` column). Filtering on a column outside the dataset's key is an error."""
+        spec = self._store.dataset(dataset)
+        filters = where | ({"zone": zones} if zones is not None else {})
+        outside = set(filters) - set(spec.group)
+        if outside:
+            raise ValueError(
+                f"{dataset}: can only filter on key columns {spec.group}, not {sorted(outside)}"
+            )
         if self._sealed_from is not None:
             event_end = min(event_end, self._sealed_from)
         stored = self._store._parts(dataset)
         if stored is None:
-            return pl.DataFrame()
-        return (
-            stored.filter(
-                (pl.col("knowledge_time") <= self.now)
-                & pl.col("zone").is_in(zones)
-                & (pl.col("event_time") >= event_start)
-                & (pl.col("event_time") < event_end)
-            )
-            .group_by(KEY, maintain_order=True)
-            .last()
-            .sort(KEY)
-            .collect()
+            return pl.DataFrame(schema=spec.schema)
+        keep = (
+            (pl.col("knowledge_time") <= self.now)
+            & (pl.col("event_time") >= event_start)
+            & (pl.col("event_time") < event_end)
         )
+        for col, allowed in filters.items():
+            keep &= pl.col(col).is_in(allowed)
+        key = list(spec.key)
+        return stored.filter(keep).group_by(key, maintain_order=True).last().sort(key).collect()
