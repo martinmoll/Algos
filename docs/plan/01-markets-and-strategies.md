@@ -51,7 +51,7 @@ A day-ahead price forecast is **not a strategy** — you cannot hold a day-ahead
 | # | Strategy family | Legs | Edge hypothesis | Data cost | Realism notes |
 |---|---|---|---|---|---|
 | S1 | **DA forecasting** (foundation, not tradable alone) | — | Feeds everything else; richly studied; lets us prove the no-look-ahead machinery against published benchmarks | Free | Phase 2 deliverable |
-| S2 | **DA ↔ imbalance** direction/spread | DA vs imbalance price | System imbalance direction is partly predictable from wind forecast error, outages, ramps | Free (eSett, ENTSO-E) | Literature says public data carries limited signal and naive baselines are strong ✅. BRPs have a **balance obligation** (plan for and achieve balance — NBS handbook ✅); Fingrid's terms explicitly bar systematic use of imbalance ✅; NO/SE wording not yet checked ⚠️. Treat as *research + hedging signal*, not a stand-alone live strategy |
+| S2 | **DA ↔ imbalance** direction/spread | DA vs imbalance price | System imbalance direction is partly predictable from wind forecast error, outages, ramps | Free (eSett, ENTSO-E) | Literature says public data carries limited signal and naive baselines are strong ✅. BRPs have a **balance obligation** (plan for and achieve balance — NBS handbook ✅); Fingrid's terms explicitly bar systematic use of imbalance ✅; NO/SE wording not yet checked ⚠️. The balance obligation and Fingrid's terms bind actual market participants; in this backtest-only project (D-041) S2 is an ordinary strategy to test |
 | S3 | **DA ↔ intraday** (IDA and continuous) | DA vs ID VWAP / IDA price | Forecast-update drift (wind/temperature revisions after 12:00) | ID prices are **paid** Nord Pool data, or self-collected going forward | Intraday prices are close to a martingale given the latest price ⚠️ (Narajewski & Ziel); edge is in the *update* information |
 | S4 | **Futures vs expected spot** (system price weeks/months; EPADs) | Future vs realised average spot | Hydrology (reservoir, snow, inflow), nuclear availability, weather regimes, risk premia | Futures prices are paid/delayed (Euronext) | The only family accessible without being a balance responsible party; lower frequency → few independent bets → hard to validate statistically |
 | S5 | **Cross-zone spreads** | Zone A vs zone B (via EPADs or physical) | Flow-based domain + hydro balance predict congestion | Free (JAO) | Expressed through S1/S4 |
@@ -59,12 +59,11 @@ A day-ahead price forecast is **not a strategy** — you cannot hold a day-ahead
 
 **Plan:** build S1 first (it is the measuring stick and the shared input), then S2 and S6 (free data, honest economic evaluation), then S3/S4 as data access allows.
 
-## 5. Market access — the uncomfortable part
+## 5. Market access — out of scope
 
-- Physical markets (DA, ID, balancing) require Nord Pool (or EPEX) membership **and** balance responsibility — being a BRP or contracting with one ✅. This is a company-level commitment with collateral, not a retail account.
-- Financial futures need a clearing-member relationship; no evidence of retail broker access was found ✅ (absence of evidence — ask Euronext/brokers).
-- Therefore the project is designed so that **paper trading is a first-class, tamper-evident mode** (see [03-no-lookahead](03-no-lookahead.md) §7): forecasts and orders are committed to an append-only, hash-chained log *before* gate closure, then settled against published prices. This gives a real, uncheatable track record that can be shown to a BRP, a fund, or an employer, or used to justify the cost of membership.
-- Route to live is an open question for the user: [OPEN-QUESTIONS](../OPEN-QUESTIONS.md) Q1.
+This project is backtesting and forecasting research only; it will never trade with real money (D-041). For context, trading for real would need Nord Pool (or EPEX) membership **and** balance responsibility for physical markets ✅, and a clearing-member relationship for futures ✅. None of that is pursued.
+
+What replaces it is evidence a backtest cannot fake: an optional **forward test** (see [03-no-lookahead](03-no-lookahead.md) §7). Forecasts and simulated orders are committed to an append-only, hash-chained log *before* gate closure, then scored against published prices. Strategy backtests still charge realistic fees and spreads on a notional size (plan 05 §5), so "edge after costs" keeps its meaning.
 
 ## 6. Honest prior
 

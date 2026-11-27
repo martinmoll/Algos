@@ -47,10 +47,12 @@ Phases are ordered so that (a) irreplaceable live vintages start accumulating as
 
 **Exit:** calibrated intervals (coverage tests pass) and an ensemble that significantly beats its best member.
 
-## Phase 4 — Live paper loop (can start with Phase 2 models)
+## Phase 4 — Forward test (optional; can start with Phase 2 models)
+
+The only evidence a backtest cannot fake. It is not a step toward live trading: the project never uses real money (D-041).
 
 - `live/` loop: forecast before 11:30 CET, hash-chained commitment, external timestamp, settlement job.
-- Dashboard: Live page; backtest-vs-forward gap.
+- Dashboard: Forward-test page; backtest-vs-forward gap.
 
 **Exit:** 30 consecutive days of committed forecasts with verified chain.
 
@@ -65,11 +67,9 @@ Phases are ordered so that (a) irreplaceable live vintages start accumulating as
 
 **Exit:** for each family, a written verdict (edge / no edge after costs) with deflated statistics; at most one vault opening per promoted configuration.
 
-## Phase 6 — Path to real money (only if Phase 5 justifies it)
+## No Phase 6
 
-- Market access decision (Q1), legal/tax/regulatory check (REMIT obligations apply to anyone trading wholesale energy products).
-- Order management, risk limits, kill switch, reconciliation with exchange/BRP statements.
-- Small-size live trading alongside paper for comparison.
+There is no path to real money (D-041). The project ends at research verdicts: for each strategy family, edge or no edge after costs, with deflated statistics and at most one vault evaluation per promoted configuration.
 
 ## Suggested order of the first tickets
 

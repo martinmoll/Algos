@@ -28,7 +28,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-003 — Paper trading is a first-class, tamper-evident mode
 
-2026-11-16 · accepted (user confirmed 2026-11-27) · agent
+2026-11-16 · superseded by D-041 · agent
 
 **Context.** Physical Nordic markets need exchange membership plus balance responsibility; futures need a clearing relationship. No retail route was found.
 **Decision.** Build a live paper loop that commits forecasts/orders to a hash-chained append-only log with an external timestamp before each gate closure, then settles against published prices.
@@ -138,7 +138,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-017 — Data licensing: no scraping of Nord Pool; free tiers treated as research-only
 
-2026-11-16 · accepted (user confirmed 2026-11-27) · agent
+2026-11-16 · superseded by D-041 · agent
 
 **Decision.** Primary sources are ENTSO-E, TSOs, eSett, Energinet, NVE, JAO, UMM. Nord Pool portal data is not scraped. Open-Meteo free tier and Energy-Charts prices are used for research only; a commercial licence is required before real-money trading depends on them.
 **Why.** Terms of use; and a system that depends on scraped data is fragile.
@@ -469,7 +469,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-040 — User answers to Q1–Q11; all earlier provisional decisions accepted
 
-2026-11-27 · accepted · user
+2026-11-27 · accepted; Q1 and Q5 answers superseded by D-041 · user
 
 **Context.** The user was shown the open questions with their defaults and the list of provisional decisions.
 
@@ -487,3 +487,24 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 - Still open: the Fingrid key and UMM registration (Q3), and which repository is the issue tracker (CLAUDE.md names `martinmoll/EnergyTrading`; the tickets live in `martinmoll/Algos`).
 
 **Revisit if** the user names an area of expertise (Q8) or a route to market (Q1).
+
+## D-041 — Backtesting research only: never real money
+
+2026-11-27 · accepted · user
+
+**Context.** The user: "I want this to be a backtesting type of project … there's never going to be any real money." Earlier entries assumed a possible path to live trading: D-003 (a paper record usable to justify market access), D-017 (a commercial licence before real money depends on free data), and D-040 (Q1 route to market, Q5 regulatory gate).
+
+**Decision.**
+- The project is backtesting and forecasting research. It will never trade, place orders or hold positions with real money.
+- **Removed:** roadmap Phase 6 (market access, legal/tax/REMIT review, order management, kill switch, exchange reconciliation), and the licence and regulatory gate before real money. Q1 is answered: no route to market. Q5 is answered: backtesting research only.
+- **Kept, with new meaning:**
+  - *Costs and size* stay in every strategy backtest as fixed modelling assumptions (fees, spreads and slippage from plan 05 §5, on a notional size of 1–5 MW per Q2), so "edge after costs" stays meaningful.
+  - *The paper loop* (Phase 4, replaces D-003) becomes an optional **forward test**: forecasts committed to a hash-chained log before gate closure and scored afterwards. It is the one check a backtest cannot fake, not a step toward live trading.
+  - *Promotion rule* becomes research walk-forward → one vault evaluation → forward record.
+  - *S2 (DA ↔ imbalance)* becomes an ordinary strategy to backtest. TSO rules against deliberately running imbalance bind only actual market participants.
+- **Unchanged:** the no-look-ahead contract, the leakage gates, the vault, run records and trial counting; the VPS collectors (forecast vintages cannot be backfilled later); the €0 data budget.
+- **Licensing (replaces D-017):** primary sources are ENTSO-E, TSOs, eSett, Energinet, NVE, JAO and UMM. Nord Pool portal data is never scraped; that is about their terms, not money. Non-commercial free tiers (Open-Meteo, Energy-Charts "private and internal use") fit a non-commercial research project; their terms are still respected (attribution, rate limits, no redistribution where forbidden).
+
+**Why.** A real-money path added work (Phase 6, regulatory review, membership questions) that this project will never use, and wording that made the paper loop sound like a sales tool.
+
+**Revisit if** the user ever changes this, which would need a new decision: the removed Phase 6 work and the licence review come back first.

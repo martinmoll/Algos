@@ -54,7 +54,7 @@ The first thing you see, because it qualifies everything else.
 ### 7. Live / paper trading
 
 - Today's committed forecasts and orders (with commitment hash and time-before-gate), then realised prices and P&L as they arrive.
-- Forward track record since go-live; chain verification status.
+- Forward-test record since the loop started; chain verification status.
 
 ## Design notes
 

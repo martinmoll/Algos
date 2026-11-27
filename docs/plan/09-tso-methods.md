@@ -94,7 +94,7 @@ Ordered by value to the plan.
 ## 3. What this does *not* license
 
 - Reimplementing a TSO formula does not create an edge by itself; the market already knows the formula. Edge comes from forecasting its *inputs* better, or from recognising when the TSO's assumption is wrong *before* the price reflects it.
-- Fingrid's terms bar systematic use of imbalance positions ✅ (plan 01). Understanding the imbalance price is for forecasting and hedging, not for deliberately running imbalance.
+- Fingrid's terms bar systematic use of imbalance positions ✅ (plan 01). They bind real market participants; this project only backtests (D-041), so an imbalance strategy is tested like any other.
 - A replica that matches too well over a period where the inputs were revised is suspicious: it probably uses the revised inputs. Check vintages.
 
 ## 4. Work items

@@ -11,7 +11,7 @@ How we measure, so that a number on the dashboard means something. Builds on [03
 
 - **Research period**: everything before `T_vault`. All development, tuning and model selection happen here, by walk-forward only.
 - **Vault**: the 12 months before project start (2025-11-16 → 2026-11-16). Conveniently it is almost exactly the 15-minute day-ahead era so far. Unreadable by research code (the store refuses `as_of` times inside it unless a vault token is supplied). Each opening is logged and counted; the expectation is single digits per year.
-- **Forward**: everything after go-live of the paper-trading loop; hash-chained. Grows forever and gradually becomes the main evidence.
+- **Forward**: everything after the forward-test loop starts (Phase 4, optional); hash-chained. Grows forever and gradually becomes the main evidence.
 
 Because the vault covers nearly all 15-minute DA data, intra-hour shape models are developed on the short pre-vault slice (2025-10-01 → 2025-11-15) plus *forward* data, and are labelled low-confidence until a year of forward data exists. This trade-off is recorded in the decision log (D-014). Until a forward read path exists, forward data is sealed along with the vault (D-031).
 
@@ -59,7 +59,7 @@ engine.settle(orders)                       # separate phase, strategy code cann
 - **Deflated Sharpe Ratio** (Bailey & López de Prado): reported next to every Sharpe, using the number and variance of trials in the family.
 - **Probability of Backtest Overfitting** via combinatorially symmetric cross-validation when selecting among many configurations.
 - **Reality check / SPA** (White; Hansen) for "best of N strategies vs benchmark".
-- Promotion rule (research → vault test → paper → live): DSR > 0.95 on research walk-forward, PBO < 0.2, all leakage tests green, stable across ≥ 3 of 4 yearly sub-periods, survives 2× cost stress. Then **one** vault evaluation with the frozen config.
+- Promotion rule (research walk-forward → one vault evaluation → forward record; never live, D-041): DSR > 0.95 on research walk-forward, PBO < 0.2, all leakage tests green, stable across ≥ 3 of 4 yearly sub-periods, survives 2× cost stress. Then **one** vault evaluation with the frozen config.
 
 ## 5. Execution simulation (pessimism by default)
 
