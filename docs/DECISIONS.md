@@ -10,7 +10,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-001 — Scope: 12 Nordic bidding zones + system price; neighbours as features
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Context.** User asked for Norway, Sweden, Denmark and "who else".
 **Decision.** Targets: NO1–NO5, SE1–SE4, DK1, DK2, FI, plus the Nordic system price. Baltics (EE, LV, LT) and DE-LU, NL, PL, GB are inputs only. Iceland excluded (isolated grid).
@@ -19,7 +19,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-002 — Day-ahead forecasting first; strategies are spreads, built on top
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Context.** "Trade the Nordic power markets" does not name a market. A day-ahead position cannot be held alone.
 **Decision.** Order of work: S1 day-ahead forecasting (foundation) → S6 simulated battery and S2 day-ahead↔imbalance (free data) → S3 intraday and S4 futures/EPAD when data access is settled. Details: [01](plan/01-markets-and-strategies.md).
@@ -28,7 +28,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-003 — Paper trading is a first-class, tamper-evident mode
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Context.** Physical Nordic markets need exchange membership plus balance responsibility; futures need a clearing relationship. No retail route was found.
 **Decision.** Build a live paper loop that commits forecasts/orders to a hash-chained append-only log with an external timestamp before each gate closure, then settles against published prices.
@@ -47,7 +47,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-005 — Three grades of knowledge time; backfill is "assumed" and reported separately
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Context.** Public APIs return the latest revision only; true publication times of historical values are mostly unknowable.
 **Decision.** `knowledge_time_source ∈ {observed, published, assumed}`. Assumed times come from one reviewed table of publication rules with a safety lag, erring late. Results are reported split by grade once both exist.
@@ -56,7 +56,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-006 — Start live snapshot collection before anything else is finished
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Decision.** As soon as the store exists, schedule collectors for every free source, even with no model to consume them.
 **Why.** Vintages are the one asset that cannot be recreated later; everything else can be rebuilt.
@@ -72,7 +72,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-008 — Day-ahead decision cutoff 11:30 CET D-1
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Decision.** Strategies acting in the day-ahead auction may use data with `knowledge_time ≤ 11:30` Europe/Oslo on D-1 (gate closure 12:00). Config value, recorded per run.
 **Why.** 30 minutes covers computation, submission and operational slack. Tighter cutoffs flatter the backtest.
@@ -87,7 +87,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-010 — Stack: Python 3.12, uv, Polars, DuckDB over Parquet
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Why.** Single-user research system; files + embedded engine are enough and keep operations at zero. Python 3.12 rather than the installed 3.14 for ML wheel availability.
 **Rejected.** Postgres/TimescaleDB (a server to run, no benefit yet); pandas as primary (slower, looser types); Spark/Delta (scale we do not have).
@@ -95,14 +95,14 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-011 — No orchestrator, no MLflow: CLI + OS scheduler + file-based run registry
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Why.** Fewer moving parts. A run is an immutable directory; DuckDB indexes them.
 **Revisit if** > ~20 scheduled jobs, complex backfills, or model-artefact management pain.
 
 ## D-012 — Dashboard: local Streamlit app, read-only
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Why.** Fastest path from Parquet to interactive pages in Python; the user is the only viewer.
 **Rejected.** Custom React front-end (weeks of work for no analytical gain); Grafana (weak for run comparison and statistics); notebooks (not reproducible, encourage ad-hoc peeking).
@@ -117,7 +117,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-014 — Vault: the 12 months before project start are sealed
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Decision.** 2025-11-16 → 2026-11-16 is unreadable by research code; openings are logged, counted and need a decision-log entry.
 **Trade-off.** This seals almost all of the 15-minute day-ahead era (began 2025-10-01), so 15-minute-specific modelling has ~6 weeks of research data plus whatever accumulates forward. Chosen anyway: an untouched recent year in the current market design is worth more than faster 15-minute research, and forward data accrues daily.
@@ -125,20 +125,20 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-015 — Model hourly means on long history; separate intra-hour shape model
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Why.** Hourly history spans a decade; 15-minute day-ahead history is one year. Decomposing keeps the long-history signal and isolates the data-poor part.
 **Revisit** when two years of 15-minute data exist.
 
 ## D-016 — Model ladder: naive → LEAR → LightGBM → DNN → probabilistic → ensemble; each rung must earn its place
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Why.** Published evidence: regularised linear and tuned DNN ensembles are state of the art; many claimed deep-learning gains vanish under proper evaluation. Transformers and foundation models enter only as ensemble candidates through the same gate. Details: [04](plan/04-models.md).
 
 ## D-017 — Data licensing: no scraping of Nord Pool; free tiers treated as research-only
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Decision.** Primary sources are ENTSO-E, TSOs, eSett, Energinet, NVE, JAO, UMM. Nord Pool portal data is not scraped. Open-Meteo free tier and Energy-Charts prices are used for research only; a commercial licence is required before real-money trading depends on them.
 **Why.** Terms of use; and a system that depends on scraped data is fragile.
@@ -151,7 +151,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-019 — One decision log file instead of an ADR directory
 
-2026-11-16 · provisional · agent
+2026-11-16 · accepted (user confirmed 2026-11-27) · agent
 
 **Why.** The user asked for a decision log that people and agents can scan top to bottom. One append-only file is easier to keep honest than many small ones. Split into `docs/adr/` if it passes ~100 entries.
 
@@ -179,14 +179,14 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-023 — Phase 0 test seams: backtest run, knowledge view, time module
 
-2026-11-17 · provisional · agent
+2026-11-17 · accepted (user confirmed 2026-11-27) · agent
 
 **Decision.** Phase 0 is tested at three seams only: (1) end-to-end backtest run on recorded HTTP responses; (2) the knowledge view, where all look-ahead tests live; (3) property tests on the time module. No mocks of internal modules.
 **Why.** The highest seams survive refactoring; look-ahead guarantees belong on the single read path.
 
 ## D-024 — Day-ahead backfill knowledge time: 13:00 local on D-1
 
-2026-11-17 · provisional · agent
+2026-11-17 · accepted (user confirmed 2026-11-27) · agent
 
 **Decision.** Assumed knowledge time for backfilled day-ahead prices = 13:00 Europe/Oslo on D-1 (results ≈12:45, plus 15 min safety lag).
 **Revisit** after live snapshots record actual publication times.
@@ -200,7 +200,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-026 — No system price in Phase 0; free SYS source is an open research item
 
-2026-11-17 · provisional · agent
+2026-11-17 · accepted (user confirmed 2026-11-27) · agent
 
 **Context.** Plan and spec assumed Energi Data Service `Elspotprices` carried the Nordic system price until 2025-09. A live query shows its `SYS` series ends 2010-12-31.
 **Decision.** Phase 0 runs on DK1 and DK2 only. The SYS pseudo-zone stays in the zones config. Finding a source for the system price (needed for futures/EPAD work, S4) is added to the research backlog; Nord Pool's paid data is the known fallback (Q4).
@@ -208,7 +208,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-027 — Phase 0 stack is trimmed to what the code uses
 
-2026-11-17 · provisional · agent
+2026-11-17 · accepted (user confirmed 2026-11-27) · agent
 
 **Context.** Spec #1 listed DuckDB, httpx, pydantic, hypothesis and import-linter (D-010, D-011). The walking skeleton (#2) needs none of them yet.
 **Decision.** Phase 0 uses Polars (Parquet scans for the store), stdlib `urllib` for HTTP, stdlib `tomllib` with TOML configs instead of pydantic + YAML, and `tzdata` (Windows has no system time-zone database). hypothesis arrives with #3 and import-linter with #6. DuckDB comes back when a query needs SQL or Polars scans get slow.
@@ -216,7 +216,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-028 — Naive forecasts on DST days match by local clock hour; data gaps stay missing
 
-2026-11-17 · provisional · agent
+2026-11-17 · accepted (user confirmed 2026-11-27) · agent
 
 **Decision.** The naive model maps the reference day to the delivery day by local clock hour. When the reference day is the spring DST day (no 02:00), 02:00 is filled from 01:00. When it is the autumn DST day, its two 02:00 prices are averaged. On an autumn DST delivery day both 02:00 hours get the same forecast. An hour missing from an ordinary reference day is **not** filled: that hour gets no forecast and the run's `n` drops below `n_expected`.
 **Why.** Clock-hour matching is the standard EPF convention and keeps daily load shapes aligned. Filling ordinary gaps would hide data problems; quality checks (#8) should surface them instead.
@@ -224,7 +224,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-029 — Vintage rules: compare with what we held at ingestion; a changed value is known from when we ingested it
 
-2026-11-17 · provisional · agent
+2026-11-17 · accepted (user confirmed 2026-11-27) · agent
 
 **Decision.**
 - `Store.append` compares each row with the vintage held for its key as of the row's own `ingested_at` (an as-of join). Identical values are dropped, so re-curating any old snapshot stores nothing.
@@ -237,7 +237,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-030 — How the look-ahead suite enforces the contract, and what it does not cover yet
 
-2026-11-17 · provisional · agent
+2026-11-17 · accepted (user confirmed 2026-11-27) · agent
 
 **Decision.**
 - Tests live in `tests/leakage/` and run as their own gate in `check.py`, with config `addopts` and `PYTEST_ADDOPTS` cleared. Under that gate a skipped, xfailed or deselected test fails the run.
@@ -442,7 +442,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 ## D-039 — Phase 0 exit: naive DK1/DK2 backtest over 2015-01-08 → 2025-11-15 (run 20261127T131921-naive-245114)
 
-2026-11-27 · provisional · agent
+2026-11-27 · accepted (user confirmed 2026-11-27) · agent
 
 **Context.** Ticket #10: prove Phase 0 on real history with a resumable backfill, then the naive walk-forward over the whole pre-vault range.
 
@@ -466,3 +466,24 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 - One early timing run on 2015 only (20261127T122901-naive-c1f3c3, status `ok`, rMAE 1.00) is also in the registry. S1 now has 2 trials.
 
 **Revisit if** a re-download of this range ever differs: curate stores it as a new vintage, and the difference measures how far the assumed-vintage history could be off.
+
+## D-040 — User answers to Q1–Q11; all earlier provisional decisions accepted
+
+2026-11-27 · accepted · user
+
+**Context.** The user was shown the open questions with their defaults and the list of provisional decisions.
+
+**Decision.**
+- The defaults of Q1–Q11 are accepted:
+  - Q1, Q4, Q5: paper trading first, €0 data budget, personal research with a licence and regulatory review before real money.
+  - Q2: small price-taker, 1–5 MW.
+  - Q7: 12-month vault.
+  - Q8: start with hydro, wind and nuclear for NO2, SE3 and DK1.
+  - Q9: CPU only.
+  - Q11: the stack as planned.
+  - Q10 is closed by D-038.
+- **Q6: collectors run on a small cloud VPS** (about €5/month) that does nothing else, with a nightly sync of what it collects. Provider choice and set-up form a Phase 1 ticket.
+- All 22 decisions that were still provisional (D-001 … D-039) are accepted.
+- Still open: the Fingrid key and UMM registration (Q3), and which repository is the issue tracker (CLAUDE.md names `martinmoll/EnergyTrading`; the tickets live in `martinmoll/Algos`).
+
+**Revisit if** the user names an area of expertise (Q8) or a route to market (Q1).
