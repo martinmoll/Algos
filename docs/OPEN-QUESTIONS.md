@@ -88,3 +88,4 @@ Decisions only you can make. Each has a recommended answer that the plan current
 
 ➡️ Register for CAMS/SoDa when Phase 2 solar work starts; defer EUMETSAT until Phase 5. Neither blocks Phase 1.
 
+**Status 2026-11-27:** closed. The user accepted the recommendation: CAMS/SoDa registration when Phase 2 solar work starts, EUMETSAT deferred to Phase 5. D-036 accepted.
