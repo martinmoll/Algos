@@ -140,3 +140,19 @@ def test_cli_lists_runs_and_trial_counts(store, tmp_path, clean, capsys):
     cli.main(["--data-dir", str(tmp_path), "runs"])
     out = capsys.readouterr().out
     assert "naive  ok" in out and "S1: 1 trials" in out
+
+
+@pytest.mark.parametrize("n", [0, 1, 2, 3, 30])
+def test_poison_sampling_always_includes_the_last_day(n):
+    from nordpower.backtest import _sample
+
+    days = [FIRST + timedelta(days=i) for i in range(7)]
+    picked = _sample(days, n)
+    assert picked[-1] == days[-1] and picked == sorted(set(picked))
+    assert len(picked) == min(max(n, 1), len(days))
+
+
+def test_cli_lists_a_hand_written_registry_entry_without_a_model(tmp_path, capsys):
+    runs.register(tmp_path / "runs", {"event": "started", "run_id": "x", "at": "t", "family": "S1"})
+    cli.main(["--data-dir", str(tmp_path), "runs"])
+    assert "x  S1  ?  abandoned" in capsys.readouterr().out

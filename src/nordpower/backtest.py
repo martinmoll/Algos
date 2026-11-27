@@ -148,8 +148,11 @@ def _check_decision_times(forecasts: pl.DataFrame) -> dict:
 
 
 def _sample(days: list[date], n: int) -> list[date]:
+    """n days spread over the run, always including the last (the longest replay)."""
     if len(days) <= n:
         return days
+    if n <= 1:
+        return days[-1:]
     return sorted({days[round(i * (len(days) - 1) / (n - 1))] for i in range(n)})
 
 

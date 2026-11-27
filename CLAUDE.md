@@ -26,6 +26,7 @@ The full contract is [docs/plan/03-no-lookahead.md](docs/plan/03-no-lookahead.md
 - All timestamps UTC; market times via the single time module in Europe/Oslo. No ad-hoc timezone arithmetic.
 - Do not scrape Nord Pool. Respect source licences ([docs/plan/02-data.md](docs/plan/02-data.md)).
 - Secrets live in `.env`, never in the repo.
+- **Finishing a ticket (D-038):** when the work is done and `check.py` passes, open a PR (`Closes #<n>` in the body), review the full diff yourself, post the findings as a PR comment, fix them, re-run `check.py`, and merge. Do not wait for the user. Stop and ask instead if a fix would weaken a leakage test, open or move the vault, change a too-good or quality threshold, or delete data or run records, or if a finding needs a decision only the user can make (put it in OPEN-QUESTIONS).
 
 ## Agent skills
 

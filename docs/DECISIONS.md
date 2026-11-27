@@ -416,7 +416,7 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 
 **Alternatives rejected.**
 - A status that is only the most severe label: hides that a run was also dirty or also too good.
-- Poison-checking every day: doubles to squares the cost of a run for little extra power; the CI suite covers every day on synthetic history.
+- Poison-checking every day: a run's cost would grow with the square of its length, for little extra power; the CI suite covers every day on synthetic history.
 - A registry rebuilt from run directories: failed runs leave no directory and would vanish.
 
 **Cost / follow-up.**
@@ -425,3 +425,17 @@ Record: context, decision, why, alternatives rejected, and what would make us re
 - The too-good alarm has no Sharpe ceiling yet: no strategy produces P&L.
 
 **Revisit if** a slow model makes the replay cost matter, or a run needs to be re-scored (that is a new run, never an edit).
+
+## D-038 — Agents open, self-review and merge their own ticket PRs
+
+2026-11-27 · accepted · user
+
+**Context.** The user asked that finished work be put up as a PR, reviewed and merged without waiting for them.
+
+**Decision.** When a ticket's work is done and `check.py` passes, the agent opens a PR that closes the ticket, reviews the full diff, posts the findings as a PR comment, fixes them, re-runs `check.py` and merges. The rule is in CLAUDE.md. The agent still stops and asks before anything that weakens a leakage test, opens or moves the vault, changes a too-good or quality threshold, or deletes data or run records, and when a finding needs a decision only the user can make.
+
+**Why.** It keeps the work moving. The real safeguards are the look-ahead gates, the sealed vault and the run status, and none of them depends on a human click.
+
+**Cost.** No second pair of eyes before merge. Provisional decisions are still logged for the user to confirm afterwards, and every review comment stays on the PR.
+
+**Revisit if** a merged change has to be reverted because of something a human review would have caught.

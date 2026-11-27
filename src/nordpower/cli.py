@@ -71,7 +71,7 @@ def main(argv: list[str] | None = None) -> None:
     elif a.cmd == "runs":
         listed = registry(a.data_dir / "runs")
         for r in listed:
-            print(f"{r['run_id']}  {r['family']}  {r['model']}  {r['state']}")
+            print(f"{r['run_id']}  {r['family']}  {r.get('model', '?')}  {r['state']}")
         for family, n in sorted(trial_counts(listed).items()):
             print(f"{family}: {n} trials")
 
